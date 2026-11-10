@@ -1,74 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 
 const Cursor: React.FC = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [hidden, setHidden] = useState(true);
-  const [clicked, setClicked] = useState(false);
-  const [linkHovered, setLinkHovered] = useState(false);
+  const haloRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const updatePosition = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY });
-      setHidden(false);
+    const halo = haloRef.current;
+    if (!halo) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    if (prefersReducedMotion || isCoarsePointer) return;
+
+    // Animate transform (x, y) via GSAP quickTo to keep motion on the compositor thread
+    const xTo = gsap.quickTo(halo, 'x', { duration: 0.45, ease: 'power3.out' });
+    const yTo = gsap.quickTo(halo, 'y', { duration: 0.45, ease: 'power3.out' });
+
+    const handleMouseMove = (e: MouseEvent) => {
+      xTo(e.clientX - 16);
+      yTo(e.clientY - 16);
+      halo.style.opacity = '1';
     };
 
-    const handleMouseDown = () => setClicked(true);
-    const handleMouseUp = () => setClicked(false);
+    const handleMouseLeave = () => {
+      halo.style.opacity = '0';
+    };
 
-    const handleLinkHoverStart = () => setLinkHovered(true);
-    const handleLinkHoverEnd = () => setLinkHovered(false);
-
-    window.addEventListener('mousemove', updatePosition);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('mouseleave', () => setHidden(true));
-    window.addEventListener('mouseenter', () => setHidden(false));
-
-    const links = document.querySelectorAll('a, button');
-    links.forEach((link) => {
-      link.addEventListener('mouseenter', handleLinkHoverStart);
-      link.addEventListener('mouseleave', handleLinkHoverEnd);
-    });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
-      window.removeEventListener('mousemove', updatePosition);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('mouseleave', () => setHidden(true));
-      window.removeEventListener('mouseenter', () => setHidden(false));
-
-      links.forEach((link) => {
-        link.removeEventListener('mouseenter', handleLinkHoverStart);
-        link.removeEventListener('mouseleave', handleLinkHoverEnd);
-      });
+      window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, []);
 
-  const cursorClasses = `fixed pointer-events-none z-50 transition-transform duration-150 ${
-    hidden ? 'opacity-0' : 'opacity-100'
-  }`;
-
   return (
-    <>
-      <div
-        className={`${cursorClasses} w-5 h-5 rounded-full border-2 border-purple-500 transform -translate-x-1/2 -translate-y-1/2 ${
-          clicked ? 'scale-90' : 'scale-100'
-        } ${linkHovered ? 'scale-150 bg-purple-500/20' : ''}`}
-        style={{
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-        }}
-      />
-      <div
-        className={`${cursorClasses} w-2 h-2 bg-purple-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 ${
-          clicked ? 'scale-150 opacity-50' : 'scale-100'
-        } ${linkHovered ? 'opacity-0' : ''}`}
-        style={{
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-        }}
-      />
-    </>
+    <div
+      ref={haloRef}
+      aria-hidden="true"
+      className="fixed top-0 left-0 w-8 h-8 rounded-full border border-brand-borderStrong/50 bg-content-primary/5 pointer-events-none z-50 opacity-0 transition-opacity duration-300 hidden md:block"
+    />
   );
 };
 
