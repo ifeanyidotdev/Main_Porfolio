@@ -1,75 +1,153 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Tilt3DCard from './Tilt3DCard';
+
+gsap.registerPlugin(ScrollTrigger);
+
+interface SkillGroup {
+  title: string;
+  content: string;
+  items: string[];
+  span: string;
+}
+
+const skillCategories: SkillGroup[] = [
+  {
+    title: 'Backend Development',
+    content:
+      'Developing robust backend systems with Node.js, Express, Python, Django and relational or document databases.',
+    items: ['Node.js', 'Express', 'Python / Django', 'PostgreSQL', 'MongoDB'],
+    span: 'lg:col-span-7',
+  },
+  {
+    title: 'Mobile Development',
+    content:
+      'Creating cross-platform mobile apps with React Native, Flutter and native technologies.',
+    items: ['React Native', 'Flutter', 'iOS (Swift)', 'Android (Kotlin)'],
+    span: 'lg:col-span-5',
+  },
+  {
+    title: 'Frontend Development',
+    content:
+      'Building responsive web applications with React, TypeScript, and modern CSS frameworks.',
+    items: ['React', 'Vue.js', 'Angular', 'TypeScript', 'Tailwind CSS'],
+    span: 'lg:col-span-5',
+  },
+  {
+    title: 'Full Stack Solutions',
+    content: 'End-to-end development from database design to production deployment.',
+    items: ['Git / GitHub', 'Docker', 'AWS', 'CI / CD', 'Testing'],
+    span: 'lg:col-span-7',
+  },
+];
 
 const Skills: React.FC = () => {
-	const skillCategories = [
-		{
-			title: "Frontend Development",
-			content:
-				"Building responsive web applications with React, TypeScript, and modern CSS frameworks.",
-			skills: [
-				{ name: "React", level: 90 },
-				{ name: "Vue.js", level: 85 },
-				{ name: "Angular", level: 80 },
-				{ name: "TypeScript", level: 90 },
-				{ name: "Tailwind CSS", level: 95 },
-			],
-		},
-		{
-			title: "Backend Development",
-			content:
-				"Developing robust backend systems with Node.js, Express, Python, Django and various databases.",
-			skills: [
-				{ name: "Node.js", level: 90 },
-				{ name: "Express", level: 85 },
-				{ name: "Python/Django", level: 75 },
-				{ name: "PostgreSQL", level: 80 },
-				{ name: "MongoDB", level: 85 },
-			],
-		},
-		{
-			title: "Mobile Development",
-			content:
-				"Creating cross-platform mobile apps with React Native, Flutter and native technologies.",
-			skills: [
-				{ name: "React Native", level: 85 },
-				{ name: "Flutter", level: 80 },
-				{ name: "iOS (Swift)", level: 70 },
-				{ name: "Android (Kotlin)", level: 65 },
-			],
-		},
-		{
-			title: "Full Stack Solutions",
-			content:
-				"End-to-end development from database design to frontend implementation.",
-			skills: [
-				{ name: "Git/GitHub", level: 90 },
-				{ name: "Docker", level: 80 },
-				{ name: "AWS", level: 75 },
-				{ name: "CI/CD", level: 80 },
-				{ name: "Testing", level: 85 },
-			],
-		},
-	];
+  const sectionRef = useRef<HTMLElement>(null);
+  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
 
-	return (
-		<section id="skills" className="py-24 relative">
-			<div className="section-container">
-				<h2 className="section-title" data-text="Skills">
-					Skills
-				</h2>
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-					{skillCategories.map((category, index) => (
-						<div key={index} className="retro-card p-6">
-							<h3 className="text-2xl font-bold mb-6 cursive-font text-center">
-								{category.title}
-							</h3>
-							<p>{category.content}</p>
-						</div>
-					))}
-				</div>
-			</div>
-		</section>
-	);
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from('.skill-bento-card', {
+        y: 32,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 82%',
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section id="skills" ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="mb-10">
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-[-0.04em] text-content-primary">
+          Skills &amp; Stack
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {skillCategories.map((category, index) => (
+          <div key={category.title} className={`skill-bento-card ${category.span}`}>
+            <Tilt3DCard intensity={4} glare={true}>
+              <div className="geist-card group p-7 sm:p-9 h-full flex flex-col justify-between relative overflow-hidden">
+                {/* Interactive Background Schematic */}
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 240 240"
+                  className="pointer-events-none absolute -right-10 -bottom-10 w-52 h-52 opacity-20 group-hover:opacity-40 transition-all duration-700 group-hover:scale-110 group-hover:rotate-12"
+                >
+                  {index % 2 === 0 ? (
+                    <>
+                      <circle
+                        cx="120"
+                        cy="120"
+                        r="88"
+                        fill="none"
+                        stroke="var(--brand-primary)"
+                        strokeWidth="1.5"
+                        strokeDasharray="6 6"
+                      />
+                      <circle
+                        cx="120"
+                        cy="120"
+                        r="54"
+                        fill="none"
+                        stroke="var(--brand-primary)"
+                        strokeWidth="2"
+                      />
+                    </>
+                  ) : (
+                    <polygon
+                      points="120,24 216,192 24,192"
+                      fill="none"
+                      stroke="var(--brand-primary)"
+                      strokeWidth="2"
+                    />
+                  )}
+                </svg>
+
+                <div className="relative z-10">
+                  <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-[-0.03em] text-content-primary mb-3">
+                    {category.title}
+                  </h3>
+                  <p className="text-base text-content-secondary leading-relaxed mb-8 max-w-xl">
+                    {category.content}
+                  </p>
+                </div>
+
+                <div className="relative z-30 flex flex-wrap gap-2.5">
+                  {category.items.map((item) => {
+                    const isSelected = selectedSkill === item;
+                    return (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => setSelectedSkill(isSelected ? null : item)}
+                        className={`geist-chip ${
+                          isSelected
+                            ? '!bg-brand-fill !text-brand-onPrimary !border-brand-fill scale-105'
+                            : ''
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </Tilt3DCard>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 };
 
 export default Skills;

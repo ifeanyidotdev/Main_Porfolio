@@ -2,16 +2,29 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
+        <meta name="color-scheme" content="light dark" />
+        <script>
+            try {
+                document.querySelector('meta[name="color-scheme"]').content =
+                    localStorage.getItem("color-scheme") ?? "light dark";
+            } catch (e) {}
+        </script>
         <link
             rel="icon"
             type="image/svg+xml"
             href="https://avatars.githubusercontent.com/u/40169444?v=4"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Ifeanyi | Software Engineer</title>
+        <title>Ifeanyichukwu Sampson — Software Engineer</title>
         <meta
             name="description"
-            content="Portfolio website of Ifeanyichukwu Sampson, a fullstack developer specializing in web and mobile applications"
+            content="Portfolio of Ifeanyichukwu Sampson, a fullstack and mobile software engineer specializing in Python, Django, Node.js, and Flutter."
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
         />
     </head>
     <body>
