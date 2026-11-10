@@ -59,9 +59,19 @@ const spanClasses = [
   'lg:col-span-7',
 ];
 
+const filterOptions = ['All', 'Flutter', 'Firebase', 'Python', 'Node.js'];
+
 const Projects: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [hoveredTag, setHoveredTag] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>('All');
+
+  const visibleProjects =
+    activeFilter === 'All'
+      ? projects
+      : projects.filter((p) =>
+          p.tags.some((t) => t.toLowerCase().includes(activeFilter.toLowerCase()))
+        );
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -82,30 +92,66 @@ const Projects: React.FC = () => {
   }, []);
 
   return (
-    <section id="projects" ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-6">
-        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-[-0.04em] text-content-primary">
-          Selected Projects
-        </h2>
+    <section
+      id="projects"
+      ref={sectionRef}
+      className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 py-24"
+    >
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 gap-6">
+        <div className="space-y-3">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-container text-brand-onContainer border border-brand-border font-mono text-xs font-semibold">
+            Featured Work
+          </span>
+          <h2 className="font-display section-fluid-title font-bold text-content-primary">
+            Selected Projects
+          </h2>
+        </div>
 
-        <a
-          href={`${SOCIAL_LINKS.github.url}?tab=repositories`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="geist-btn-secondary self-start sm:self-auto group"
-        >
-          <Github className="h-4 w-4" />
-          <span>More on GitHub</span>
-          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-        </a>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Google M3 Filter Pill Group */}
+          <div className="inline-flex flex-wrap items-center gap-1.5 p-1.5 rounded-full bg-surface-elevated border border-brand-border">
+            {filterOptions.map((option) => {
+              const isSelected = activeFilter === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setActiveFilter(option)}
+                  className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                    isSelected
+                      ? 'bg-purple-700 bg-brand-fill text-white shadow-sm'
+                      : 'text-content-secondary hover:text-content-primary'
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+
+          <a
+            href={`${SOCIAL_LINKS.github.url}?tab=repositories`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="geist-btn-secondary self-start sm:self-auto group"
+          >
+            <Github className="h-4 w-4" />
+            <span>More on GitHub</span>
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {projects.map((project, idx) => (
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {visibleProjects.map((project, idx) => (
           <ProjectCard
             key={project.id}
             project={project}
-            spanClass={spanClasses[idx % spanClasses.length]}
+            spanClass={
+              visibleProjects.length === 1
+                ? 'lg:col-span-12'
+                : spanClasses[idx % spanClasses.length]
+            }
             activeTag={hoveredTag}
             onHoverTag={setHoveredTag}
           />

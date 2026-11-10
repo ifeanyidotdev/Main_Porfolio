@@ -488,15 +488,24 @@ const ExperienceMap3D: React.FC = () => {
   };
 
   return (
-    <section id="experience" ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <div className="mb-8 exp-reveal flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-[-0.04em] text-content-primary">
-          Experience
-        </h2>
+    <section
+      id="experience"
+      ref={sectionRef}
+      className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 py-24"
+    >
+      <div className="mb-10 exp-reveal flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-3">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-container text-brand-onContainer border border-brand-border font-mono text-xs font-semibold">
+            Career Trajectory
+          </span>
+          <h2 className="font-display section-fluid-title font-bold text-content-primary">
+            Experience
+          </h2>
+        </div>
 
-        {/* Interactive Company Selector Tabs */}
+        {/* Google M3 Pill Company Selector Tabs */}
         <div
-          className="inline-flex flex-wrap gap-1.5 p-1 rounded-xl bg-surface-elevated border border-brand-border"
+          className="inline-flex flex-wrap gap-1.5 p-1.5 rounded-full bg-surface-elevated border border-brand-border"
           role="tablist"
           aria-label="Work experience"
         >
@@ -508,7 +517,7 @@ const ExperienceMap3D: React.FC = () => {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => flyToMilestone(idx)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive
                     ? 'bg-purple-700 bg-brand-fill text-white shadow-sm'
                     : 'text-content-secondary hover:text-content-primary hover:bg-surface-muted'
@@ -521,18 +530,18 @@ const ExperienceMap3D: React.FC = () => {
         </div>
       </div>
 
-      {/* Architectural Split Grid */}
+      {/* Google M3 Full-Width Split Stage */}
       <div
         onMouseMove={handleSectionMouseMove}
         onMouseLeave={() => {
           if (spotlightRef.current) spotlightRef.current.style.opacity = '0';
         }}
-        className="exp-reveal relative border border-brand-border bg-surface-card rounded-2xl overflow-hidden shadow-xl"
+        className="exp-reveal relative border border-brand-border bg-surface-card rounded-[32px] overflow-hidden shadow-2xl"
       >
-        <span className="geist-crosshair -top-1 -left-1" />
-        <span className="geist-crosshair -top-1 -right-1" />
-        <span className="geist-crosshair -bottom-1 -left-1" />
-        <span className="geist-crosshair -bottom-1 -right-1" />
+        <span className="geist-crosshair top-3 left-3" />
+        <span className="geist-crosshair top-3 right-3" />
+        <span className="geist-crosshair bottom-3 left-3" />
+        <span className="geist-crosshair bottom-3 right-3" />
 
         <div
           ref={spotlightRef}
@@ -541,25 +550,30 @@ const ExperienceMap3D: React.FC = () => {
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-brand-border">
           {/* Left: Interactive 3D Globe */}
-          <div className="lg:col-span-6 relative min-h-[390px] sm:min-h-[460px] flex items-center justify-center bg-surface-elevated overflow-hidden">
+          <div className="lg:col-span-6 relative min-h-[420px] sm:min-h-[520px] flex items-center justify-center bg-surface-elevated overflow-hidden">
+            <div className="absolute top-5 left-5 z-20 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-card/90 backdrop-blur-md border border-brand-border font-mono text-xs text-content-secondary">
+              <span className="h-2 w-2 rounded-full bg-brand-primary animate-pulse" />
+              Drag to Rotate Globe • Click Beacons
+            </div>
+
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute w-72 h-72 rounded-full blur-3xl opacity-15"
+              className="pointer-events-none absolute w-80 h-80 rounded-full blur-3xl opacity-15"
               style={{
                 background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)',
               }}
             />
             <div
               ref={canvasContainerRef}
-              className="relative z-10 w-full h-[390px] sm:h-[460px] cursor-grab active:cursor-grabbing"
+              className="relative z-10 w-full h-[420px] sm:h-[520px] cursor-grab active:cursor-grabbing"
               aria-label="3D work experience globe"
             />
 
-            <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
+            <div className="absolute bottom-5 right-5 z-20 flex items-center gap-2">
               <button
                 type="button"
                 onClick={handlePrev}
-                className="h-10 w-10 rounded-xl flex items-center justify-center bg-surface-card hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
+                className="h-11 w-11 rounded-full flex items-center justify-center bg-surface-card hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
                 aria-label="Previous experience"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -567,7 +581,7 @@ const ExperienceMap3D: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="h-10 w-10 rounded-xl flex items-center justify-center bg-purple-700 bg-brand-fill text-white hover:brightness-110 transition-all"
+                className="h-11 w-11 rounded-full flex items-center justify-center bg-purple-700 bg-brand-fill text-white hover:brightness-110 transition-all"
                 aria-label="Next experience"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -575,41 +589,54 @@ const ExperienceMap3D: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Experience Detail Cell */}
-          <div className="lg:col-span-6 p-8 sm:p-12 flex flex-col justify-between">
+          {/* Right: Expressive Google M3 Experience Detail Stage */}
+          <div className="lg:col-span-6 p-8 sm:p-12 xl:p-16 flex flex-col justify-between gap-8">
             <div ref={detailContentRef} className="space-y-6">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="px-3.5 py-1 rounded-full bg-brand-container text-brand-onContainer border border-brand-border font-mono text-xs font-semibold">
-                  {currentMilestone.company}
-                </span>
-                <span className="text-xs font-mono font-medium text-content-secondary">
-                  {currentMilestone.period}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="px-4 py-1.5 rounded-full bg-brand-container text-brand-onContainer border border-brand-border font-mono text-xs font-semibold">
+                    {currentMilestone.company}
+                  </span>
+                  <span className="px-3.5 py-1.5 rounded-full bg-surface-elevated border border-brand-border text-xs font-mono font-medium text-content-secondary">
+                    {currentMilestone.period}
+                  </span>
+                </div>
+                <span className="font-mono text-xs font-bold text-brand-primary">
+                  0{activeIndex + 1} / 0{EXPERIENCE_MILESTONES.length}
                 </span>
               </div>
 
-              <h3 className="font-display text-2xl sm:text-4xl font-bold tracking-[-0.03em] text-content-primary">
+              <h3 className="font-display text-2xl sm:text-4xl xl:text-5xl font-bold tracking-[-0.03em] text-content-primary">
                 {currentMilestone.title}
               </h3>
 
-              <p className="text-base sm:text-lg text-content-secondary leading-relaxed">
+              <p className="text-base sm:text-lg xl:text-xl text-content-secondary leading-relaxed">
                 {currentMilestone.description}
               </p>
             </div>
 
-            <div className="pt-8 flex items-center gap-2">
-              {EXPERIENCE_MILESTONES.map((item, idx) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => flyToMilestone(idx)}
-                  aria-label={`Select ${item.company}`}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
-                    idx === activeIndex
-                      ? 'w-10 bg-purple-700 bg-brand-fill'
-                      : 'w-2.5 bg-brand-border hover:bg-brand-borderStrong'
-                  }`}
-                />
-              ))}
+            {/* Interactive Milestone Quick-Select Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-6 border-t border-brand-border">
+              {EXPERIENCE_MILESTONES.map((item, idx) => {
+                const isSelected = idx === activeIndex;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => flyToMilestone(idx)}
+                    className={`text-left p-3.5 rounded-2xl border transition-all duration-200 ${
+                      isSelected
+                        ? 'bg-brand-container border-brand-primary text-brand-onContainer'
+                        : 'bg-surface-elevated border-brand-border text-content-secondary hover:text-content-primary'
+                    }`}
+                  >
+                    <div className="font-mono text-[11px] opacity-75">0{idx + 1}</div>
+                    <div className="font-display text-xs sm:text-sm font-bold truncate mt-0.5">
+                      {item.company}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

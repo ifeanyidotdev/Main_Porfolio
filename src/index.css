@@ -3,50 +3,50 @@
 @tailwind utilities;
 
 :root {
-  /* Modern Light Theme — Clean Neutral Alabaster Surfaces + Refined Royal Amethyst Accent */
-  --bg-primary-light: #fcfcfd;
-  --bg-elevated-light: #f4f4f7;
-  --bg-card-light: rgba(255, 255, 255, 0.95);
-  --bg-glass-light: rgba(252, 252, 253, 0.88);
-  --bg-muted-light: #ebebf0;
+  /* Google Material Design 3 (M3) Light Base Theme — Seeded from Royal Amethyst */
+  --bg-primary-light: #fcfbfe;
+  --bg-elevated-light: #f4f1f8;
+  --bg-card-light: #ffffff;
+  --bg-glass-light: rgba(252, 251, 254, 0.88);
+  --bg-muted-light: #eae5f2;
 
-  --text-primary-light: #09090b;
-  --text-secondary-light: #52525b;
-  --text-muted-light: #71717a;
+  --text-primary-light: #1c1b1f;
+  --text-secondary-light: #49454f;
+  --text-muted-light: #79747e;
 
   --brand-primary-light: #6d28d9;
   --brand-fill-light: #6d28d9;
   --brand-on-primary-light: #ffffff;
-  --brand-container-light: #f3e8ff;
-  --brand-on-container-light: #3b0764;
+  --brand-container-light: #ede9fe;
+  --brand-on-container-light: #2e1065;
 
-  --border-subtle-light: #e4e4e9;
-  --border-strong-light: #7c3aed;
+  --border-subtle-light: #e2dce9;
+  --border-strong-light: #6d28d9;
 
-  --scrollbar-track-light: #f4f4f7;
-  --scrollbar-thumb-light: #7c3aed;
+  --scrollbar-track-light: #f4f1f8;
+  --scrollbar-thumb-light: #6d28d9;
 
-  /* Modern Dark Theme — True Neutral Obsidian Surfaces (#060609) + Refined Amethyst-Indigo Accent */
-  --bg-primary-dark: #060609;
-  --bg-elevated-dark: #0d0d12;
-  --bg-card-dark: rgba(16, 16, 22, 0.92);
-  --bg-glass-dark: rgba(6, 6, 9, 0.86);
-  --bg-muted-dark: #181820;
+  /* Google Material Design 3 (M3) Dark Base Theme — Clean Neutral Surface Hierarchy + Royal Amethyst */
+  --bg-primary-dark: #0b0b0f;
+  --bg-elevated-dark: #13131a;
+  --bg-card-dark: #181822;
+  --bg-glass-dark: rgba(11, 11, 15, 0.86);
+  --bg-muted-dark: #232330;
 
-  --text-primary-dark: #f8fafc;
-  --text-secondary-dark: #a1a1aa;
-  --text-muted-dark: #71717a;
+  --text-primary-dark: #f4eff4;
+  --text-secondary-dark: #cac4d0;
+  --text-muted-dark: #938f99;
 
   --brand-primary-dark: #7c3aed;
   --brand-fill-dark: #6d28d9;
   --brand-on-primary-dark: #ffffff;
-  --brand-container-dark: rgba(124, 58, 237, 0.15);
+  --brand-container-dark: rgba(124, 58, 237, 0.18);
   --brand-on-container-dark: #e9d5ff;
 
-  --border-subtle-dark: #22222c;
+  --border-subtle-dark: #282836;
   --border-strong-dark: #8b5cf6;
 
-  --scrollbar-track-dark: #060609;
+  --scrollbar-track-dark: #0b0b0f;
   --scrollbar-thumb-dark: #6d28d9;
 
   /* Default Fallback Tokens */
@@ -202,20 +202,20 @@ body {
   -webkit-mask-image: radial-gradient(ellipse 85% 65% at 50% 12%, rgba(0, 0, 0, 0.55) 20%, transparent 90%);
 }
 
-/* Architectural Surface Card with Top-Edge Specular Highlight */
+/* Google M3 Expressive Surface Card */
 .geist-card {
   position: relative;
   background-color: var(--bg-card);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 28px;
   overflow: hidden;
-  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.22);
   transition:
-    border-color 0.25s ease,
-    background-color 0.25s ease,
-    box-shadow 0.3s ease;
+    border-color 0.25s cubic-bezier(0.2, 0, 0, 1),
+    background-color 0.25s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
 
 /* Specular Top-Edge Shimmer Line */
@@ -225,7 +225,7 @@ body {
   top: 0;
   left: 12%;
   right: 12%;
-  height: 1px;
+  height: 1.5px;
   background: linear-gradient(90deg, transparent, var(--brand-primary), transparent);
   opacity: 0.35;
   transition: opacity 0.3s ease, left 0.3s ease, right 0.3s ease;
@@ -237,7 +237,7 @@ body {
   border-color: var(--border-strong);
   box-shadow:
     0 0 0 1px var(--border-strong),
-    0 22px 48px -14px rgba(109, 40, 217, 0.28);
+    0 24px 52px -14px rgba(109, 40, 217, 0.26);
 }
 
 .geist-card:hover::before {
@@ -246,24 +246,24 @@ body {
   opacity: 1;
 }
 
-/* Primary Action Button */
+/* Google M3 Filled Pill Button */
 .geist-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.55rem;
-  border-radius: 12px;
+  gap: 0.55rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 9999px;
   font-size: 0.9375rem;
   font-weight: 600;
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 55%, #4f46e5 100%);
+  background-color: var(--brand-fill);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow:
-    0 8px 24px -6px rgba(109, 40, 217, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    0 8px 24px -6px rgba(109, 40, 217, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
   transition:
-    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.2s cubic-bezier(0.2, 0, 0, 1),
     filter 0.2s ease,
     box-shadow 0.2s ease;
 }
@@ -271,28 +271,29 @@ body {
 .geist-btn-primary:hover {
   filter: brightness(1.08);
   box-shadow:
-    0 12px 32px -4px rgba(124, 58, 237, 0.72),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    0 12px 32px -4px rgba(124, 58, 237, 0.68),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
 }
 
-/* Secondary Outlined Button */
+/* Google M3 Tonal / Outlined Pill Button */
 .geist-btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.55rem;
-  border-radius: 12px;
+  gap: 0.55rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 9999px;
   font-size: 0.9375rem;
   font-weight: 600;
   background-color: var(--bg-elevated);
   color: var(--text-primary);
   border: 1px solid var(--border-subtle);
   transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease,
+    border-color 0.2s cubic-bezier(0.2, 0, 0, 1),
+    background-color 0.2s cubic-bezier(0.2, 0, 0, 1),
+    color 0.2s cubic-bezier(0.2, 0, 0, 1),
     box-shadow 0.2s ease,
-    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .geist-btn-secondary:hover {
@@ -301,12 +302,12 @@ body {
   color: var(--brand-on-container);
 }
 
-/* Interactive Tech Chip */
+/* Google M3 Interactive Tonal Assist / Filter Chip */
 .geist-chip {
   display: inline-flex;
   align-items: center;
-  padding: 0.375rem 0.85rem;
-  border-radius: 9px;
+  padding: 0.425rem 0.95rem;
+  border-radius: 9999px;
   font-size: 0.8125rem;
   font-family: 'Roboto Mono', monospace;
   font-weight: 500;
@@ -315,11 +316,11 @@ body {
   border: 1px solid var(--border-subtle);
   cursor: pointer;
   transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease,
+    border-color 0.2s cubic-bezier(0.2, 0, 0, 1),
+    background-color 0.2s cubic-bezier(0.2, 0, 0, 1),
+    color 0.2s cubic-bezier(0.2, 0, 0, 1),
     box-shadow 0.2s ease,
-    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .geist-chip:hover {
@@ -328,6 +329,45 @@ body {
   color: #ffffff;
   box-shadow: 0 6px 18px -4px rgba(109, 40, 217, 0.45);
   transform: translateY(-2px);
+}
+
+/* Fluid Responsive Typography (WCAG 1.4.4 compliant <= 2.5x ratio) */
+.hero-fluid-title {
+  font-size: clamp(2.5rem, 1.4rem + 3.2vw, 5.5rem);
+  line-height: 1.03;
+  letter-spacing: -0.04em;
+}
+
+.section-fluid-title {
+  font-size: clamp(2rem, 1.3rem + 2vw, 3.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+/* Full-Viewport Hero Sizing with dvh + vh Fallback */
+.min-h-screen-dynamic {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Infinite Marquee Animation for Tech Ribbon */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 32s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
 
 /* Crosshair (+) Node Marker */

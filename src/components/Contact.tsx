@@ -93,24 +93,31 @@ const Contact: React.FC = () => {
   ];
 
   return (
-    <section id="contact" ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <div className="mb-10 contact-reveal">
-        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-[-0.04em] text-content-primary">
+    <section
+      id="contact"
+      ref={sectionRef}
+      className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 py-24"
+    >
+      <div className="mb-12 contact-reveal space-y-3">
+        <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-container text-brand-onContainer border border-brand-border font-mono text-xs font-semibold">
+          Get In Touch
+        </span>
+        <h2 className="font-display section-fluid-title font-bold text-content-primary">
           Contact
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5 contact-reveal">
           <Tilt3DCard intensity={4} glare={true}>
-            <div className="geist-card p-8 sm:p-10 h-full flex flex-col justify-between bg-surface-elevated">
-              <p className="text-base sm:text-lg text-content-secondary leading-relaxed mb-8">
+            <div className="geist-card p-8 sm:p-12 h-full flex flex-col justify-between bg-surface-elevated">
+              <p className="text-base sm:text-lg xl:text-xl text-content-secondary leading-relaxed mb-8">
                 Have a project in mind or want to discuss collaboration opportunities? I’d love to
                 hear from you! Fill out the form or reach me through any of the contact methods
                 listed.
               </p>
 
-              <div className="space-y-3 relative z-30">
+              <div className="space-y-3.5 relative z-30">
                 {contactInfo.map((info, index) => {
                   const isCopied = copiedIndex === index;
                   return (
@@ -118,11 +125,11 @@ const Contact: React.FC = () => {
                       key={info.text}
                       type="button"
                       onClick={() => handleCopy(info.text, index)}
-                      className="w-full group flex items-center justify-between gap-4 px-4 py-3.5 rounded-xl bg-surface-card hover:bg-brand-fill text-content-primary hover:text-brand-onPrimary border border-brand-border hover:border-brand-fill transition-all duration-200 text-left"
+                      className="w-full group flex items-center justify-between gap-4 px-5 py-4 rounded-2xl bg-surface-card hover:bg-brand-fill text-content-primary hover:text-brand-onPrimary border border-brand-border hover:border-brand-fill transition-all duration-200 text-left"
                       title={`Click to copy ${info.text}`}
                     >
                       <div className="flex items-center gap-3.5">
-                        <div className="h-9 w-9 rounded-lg bg-brand-container text-brand-onContainer group-hover:bg-surface-bg/20 group-hover:text-brand-onPrimary flex items-center justify-center shrink-0 transition-colors">
+                        <div className="h-10 w-10 rounded-full bg-brand-container text-brand-onContainer group-hover:bg-surface-bg/20 group-hover:text-brand-onPrimary flex items-center justify-center shrink-0 transition-colors">
                           {info.icon}
                         </div>
                         <span className="text-sm sm:text-base font-mono font-medium">
@@ -146,7 +153,7 @@ const Contact: React.FC = () => {
 
         <div className="lg:col-span-7 contact-reveal">
           <Tilt3DCard intensity={3} glare={true}>
-            <div className="geist-card p-8 sm:p-10 relative">
+            <div className="geist-card p-8 sm:p-12 relative">
               <div className="geist-grid-beam top-0 left-0" />
               <form
                 onSubmit={handleSubmit}
@@ -170,7 +177,7 @@ const Contact: React.FC = () => {
                       onChange={handleChange}
                       required
                       autoComplete="name"
-                      className="w-full px-4 py-3 bg-surface-elevated border border-brand-border focus:border-brand-fill rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-fill/30 text-content-primary placeholder:text-content-muted transition-all"
+                      className="w-full px-4 py-3.5 bg-surface-elevated border border-brand-border focus:border-brand-fill rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-fill/30 text-content-primary placeholder:text-content-muted transition-all"
                       placeholder="Your Name"
                     />
                   </div>
@@ -190,7 +197,7 @@ const Contact: React.FC = () => {
                       onChange={handleChange}
                       required
                       autoComplete="email"
-                      className="w-full px-4 py-3 bg-surface-elevated border border-brand-border focus:border-brand-fill rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-fill/30 text-content-primary placeholder:text-content-muted transition-all"
+                      className="w-full px-4 py-3.5 bg-surface-elevated border border-brand-border focus:border-brand-fill rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-fill/30 text-content-primary placeholder:text-content-muted transition-all"
                       placeholder="your.email@example.com"
                     />
                   </div>
@@ -210,7 +217,7 @@ const Contact: React.FC = () => {
                     value={formData.subject}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-surface-elevated border border-brand-border focus:border-brand-fill rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-fill/30 text-content-primary placeholder:text-content-muted transition-all"
+                    className="w-full px-4 py-3.5 bg-surface-elevated border border-brand-border focus:border-brand-fill rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-fill/30 text-content-primary placeholder:text-content-muted transition-all"
                     placeholder="Project Inquiry"
                   />
                 </div>
@@ -229,7 +236,7 @@ const Contact: React.FC = () => {
                     onChange={handleChange}
                     required
                     rows={5}
-                    className="w-full px-4 py-3 bg-surface-elevated border border-brand-border focus:border-brand-fill rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-fill/30 text-content-primary placeholder:text-content-muted resize-y transition-all"
+                    className="w-full px-4 py-3.5 bg-surface-elevated border border-brand-border focus:border-brand-fill rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-fill/30 text-content-primary placeholder:text-content-muted resize-y transition-all"
                     placeholder="Hello, I'd like to discuss a project..."
                   />
                 </div>

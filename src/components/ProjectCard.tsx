@@ -208,7 +208,7 @@ const ProjectCard: React.FC<ProjectProps> = ({
         >
           <div>
             {/* 3D Floating Preview Frame */}
-            <div className="relative h-56 sm:h-64 rounded-xl overflow-hidden bg-surface-elevated mb-6 border border-brand-border translate-z-20">
+            <div className="relative h-60 sm:h-72 rounded-2xl overflow-hidden bg-surface-elevated mb-6 border border-brand-border translate-z-20">
               {!imageError ? (
                 <img
                   ref={imgRef}
@@ -236,7 +236,7 @@ const ProjectCard: React.FC<ProjectProps> = ({
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`${project.title} source code`}
-                      className="h-10 w-10 rounded-xl flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-brand-onPrimary border border-brand-border hover:border-brand-fill transition-all"
+                      className="h-11 w-11 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-brand-onPrimary border border-brand-border hover:border-brand-fill transition-all"
                     >
                       <Github className="h-4 w-4" />
                     </a>
@@ -246,7 +246,7 @@ const ProjectCard: React.FC<ProjectProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Open ${project.title}`}
-                    className="h-10 w-10 rounded-xl flex items-center justify-center bg-brand-fill text-brand-onPrimary hover:brightness-110 transition-all"
+                    className="h-11 w-11 rounded-full flex items-center justify-center bg-brand-fill text-brand-onPrimary hover:brightness-110 transition-all"
                   >
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </a>

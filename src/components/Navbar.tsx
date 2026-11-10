@@ -87,11 +87,11 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
         style={{ width: `${scrollProgress}%` }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 h-16 sm:h-20 flex items-center justify-between">
         {/* Interactive Triangle Brand Mark */}
         <a
           href="#home"
-          className="group inline-flex items-center gap-2.5 font-display text-xl sm:text-2xl font-bold tracking-tight text-content-primary"
+          className="group inline-flex items-center gap-3 font-display text-xl sm:text-2xl font-bold tracking-tight text-content-primary"
         >
           <svg
             aria-hidden="true"
@@ -104,17 +104,17 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
           <span>Ifeanyi</span>
         </a>
 
-        {/* Interactive Sliding Pill Navigation */}
+        {/* Google M3 Interactive Sliding Pill Navigation */}
         <nav
           ref={navContainerRef}
           onMouseLeave={() => setHoveredId(null)}
-          className="hidden md:flex items-center relative p-1 rounded-xl bg-surface-elevated border border-brand-border"
+          className="hidden md:flex items-center relative p-1.5 rounded-full bg-surface-elevated border border-brand-border shadow-sm"
           aria-label="Primary Navigation"
         >
           <span
             ref={pillIndicatorRef}
             aria-hidden="true"
-            className="absolute top-1 bottom-1 left-0 rounded-lg bg-purple-700 bg-brand-fill pointer-events-none opacity-0 shadow-sm"
+            className="absolute top-1.5 bottom-1.5 left-0 rounded-full bg-purple-700 bg-brand-fill pointer-events-none opacity-0 shadow-sm"
           />
           {navLinks.map((link) => {
             const isHighlighted = targetId === link.id;
@@ -126,7 +126,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
                 }}
                 href={`#${link.id}`}
                 onMouseEnter={() => setHoveredId(link.id)}
-                className={`relative z-10 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors duration-150 ${
+                className={`relative z-10 px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-150 ${
                   isHighlighted
                     ? 'text-white font-semibold'
                     : 'text-content-secondary hover:text-content-primary'
@@ -139,12 +139,20 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
         </nav>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <a
+            href="#contact"
+            className="hidden lg:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-container text-brand-onContainer border border-brand-border text-xs font-semibold hover:bg-brand-fill hover:text-white transition-all duration-200"
+          >
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Available for Work</span>
+          </a>
+
           <button
             ref={themeBtnRef}
             type="button"
             onClick={handleThemeClick}
-            className="h-9 w-9 rounded-xl flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
+            className="h-10 w-10 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
             aria-label={nextThemeLabel}
             title={nextThemeLabel}
           >
@@ -158,7 +166,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden h-9 w-9 rounded-xl flex items-center justify-center bg-surface-elevated text-content-primary border border-brand-border focus:outline-none"
+            className="md:hidden h-10 w-10 rounded-full flex items-center justify-center bg-surface-elevated text-content-primary border border-brand-border focus:outline-none"
             aria-label="Toggle navigation menu"
             aria-expanded={isMenuOpen}
           >
