@@ -34,11 +34,11 @@ const navLinks = [
 const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const { resolvedTheme, toggleTheme } = useTheme();
 
   const navContainerRef = useRef<HTMLDivElement>(null);
   const pillIndicatorRef = useRef<HTMLSpanElement>(null);
+  const scrollBarRef = useRef<HTMLDivElement>(null);
   const themeBtnRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
@@ -70,10 +70,18 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
   }, [updateIndicator]);
 
   useEffect(() => {
+    let ticking = false;
     const onScroll = () => {
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (docHeight > 0) {
-        setScrollProgress(Math.min(100, Math.max(0, (window.scrollY / docHeight) * 100)));
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          if (docHeight > 0 && scrollBarRef.current) {
+            const pct = Math.min(100, Math.max(0, (window.scrollY / docHeight) * 100));
+            scrollBarRef.current.style.width = `${pct}%`;
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -145,9 +153,9 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-surface-glass backdrop-blur-xl border-b border-brand-border">
       {/* Top Scroll Progress Line */}
       <div
+        ref={scrollBarRef}
         aria-hidden="true"
-        className="absolute top-0 left-0 h-[2px] bg-gradient-to-r from-violet-600 via-purple-500 to-indigo-400 transition-[width] duration-150"
-        style={{ width: `${scrollProgress}%` }}
+        className="absolute top-0 left-0 h-[2px] w-0 bg-gradient-to-r from-violet-600 via-purple-500 to-indigo-400 transition-[width] duration-150"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">

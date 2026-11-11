@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import * as THREE from 'three';
+import * as THREE from '../utils/three-lite';
+import type * as THREE_TYPES from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -62,7 +63,7 @@ const EXPERIENCE_MILESTONES: ExperienceMilestone[] = [
 
 const GLOBE_RADIUS = 1.95;
 
-function latLonToVector3(latDeg: number, lonDeg: number, radius: number): THREE.Vector3 {
+function latLonToVector3(latDeg: number, lonDeg: number, radius: number): THREE_TYPES.Vector3 {
   const lat = THREE.MathUtils.degToRad(latDeg);
   const lon = THREE.MathUtils.degToRad(lonDeg);
   const x = radius * Math.cos(lat) * Math.sin(lon);
@@ -80,8 +81,8 @@ const ExperienceMap3D: React.FC = () => {
   const spotlightRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
 
-  const globePivotRef = useRef<THREE.Group | null>(null);
-  const beaconGroupsRef = useRef<THREE.Group[]>([]);
+  const globePivotRef = useRef<THREE_TYPES.Group | null>(null);
+  const beaconGroupsRef = useRef<THREE_TYPES.Group[]>([]);
 
   const flyToMilestone = useCallback((index: number) => {
     setActiveIndex(index);
@@ -129,323 +130,373 @@ const ExperienceMap3D: React.FC = () => {
     const container = canvasContainerRef.current;
     if (!container) return;
 
-    const isDark = resolvedTheme === 'dark';
+    let isDisposed = false;
+    let isVisible = false;
+    let hasInitialized = false;
+    let cleanupScene: (() => void) | null = null;
 
-    const width = container.clientWidth || 560;
-    const height = container.clientHeight || 430;
+    const initGlobe = () => {
+      if (isDisposed || hasInitialized || !container) return;
+      hasInitialized = true;
 
-    const scene = new THREE.Scene();
+      const isDark = resolvedTheme === 'dark';
 
-    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0, 0.35, 6.9);
-    camera.lookAt(0, 0, 0);
+      const width = container.clientWidth || 560;
+      const height = container.clientHeight || 430;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    container.innerHTML = '';
-    container.appendChild(renderer.domElement);
+      const scene = new THREE.Scene();
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, isDark ? 1.25 : 1.75);
-    scene.add(ambientLight);
+      const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+      camera.position.set(0, 0.35, 6.9);
+      camera.lookAt(0, 0, 0);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, isDark ? 2.2 : 1.6);
-    dirLight.position.set(6, 8, 7);
-    scene.add(dirLight);
+      let renderer: THREE_TYPES.WebGLRenderer;
+      try {
+        renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+        });
+      } catch {
+        return;
+      }
 
-    const rimLight = new THREE.DirectionalLight(isDark ? 0xa78bfa : 0x7c3aed, 1.8);
-    rimLight.position.set(-6, -5, 4);
-    scene.add(rimLight);
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      container.innerHTML = '';
+      container.appendChild(renderer.domElement);
 
-    const globePivot = new THREE.Group();
-    scene.add(globePivot);
-    globePivotRef.current = globePivot;
+      const ambientLight = new THREE.AmbientLight(0xffffff, isDark ? 1.35 : 1.85);
+      scene.add(ambientLight);
 
-    const primaryColor = isDark ? 0xa78bfa : 0x6d28d9;
-    const containerColor = isDark ? 0x6d28d9 : 0xddd6fe;
-    const globeSurfaceColor = isDark ? 0x0d0d12 : 0xf4f4f7;
-    const gridWireColor = isDark ? 0x8b5cf6 : 0x6d28d9;
+      const dirLight = new THREE.DirectionalLight(0xffffff, isDark ? 2.0 : 1.5);
+      dirLight.position.set(6, 8, 7);
+      scene.add(dirLight);
 
-    // 1. Core Globe Sphere
-    const sphereGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 48, 48);
-    const sphereMat = new THREE.MeshStandardMaterial({
-      color: globeSurfaceColor,
-      roughness: 0.68,
-      metalness: 0.18,
-    });
-    const globeMesh = new THREE.Mesh(sphereGeo, sphereMat);
-    globePivot.add(globeMesh);
+      const rimLight = new THREE.DirectionalLight(isDark ? 0xa78bfa : 0x7c3aed, 1.6);
+      rimLight.position.set(-6, -5, 4);
+      scene.add(rimLight);
 
-    // 2. Geodesic Wireframe Shell
-    const wireGeo = new THREE.IcosahedronGeometry(GLOBE_RADIUS + 0.015, 3);
-    const wireMat = new THREE.MeshBasicMaterial({
-      color: gridWireColor,
-      wireframe: true,
-      transparent: true,
-      opacity: isDark ? 0.44 : 0.34,
-    });
-    const wireMesh = new THREE.Mesh(wireGeo, wireMat);
-    globePivot.add(wireMesh);
+      const globePivot = new THREE.Group();
+      scene.add(globePivot);
+      globePivotRef.current = globePivot;
 
-    // 3. Spherical Surface Dot Constellation on Globe
-    const dotCount = 200;
-    const dotPositions = new Float32Array(dotCount * 3);
-    for (let i = 0; i < dotCount; i++) {
-      const phi = Math.acos(2 * Math.random() - 1);
-      const theta = Math.random() * Math.PI * 2;
-      const r = GLOBE_RADIUS + 0.03;
-      dotPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      dotPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      dotPositions[i * 3 + 2] = r * Math.cos(phi);
-    }
-    const surfaceDotsGeo = new THREE.BufferGeometry();
-    surfaceDotsGeo.setAttribute('position', new THREE.BufferAttribute(dotPositions, 3));
-    const surfaceDotsMat = new THREE.PointsMaterial({
-      color: isDark ? 0xc4b5fd : 0x5b21b6,
-      size: 0.045,
-      transparent: true,
-      opacity: isDark ? 0.72 : 0.5,
-    });
-    const surfaceDots = new THREE.Points(surfaceDotsGeo, surfaceDotsMat);
-    globePivot.add(surfaceDots);
+      const primaryColor = isDark ? 0xa78bfa : 0x6d28d9;
+      const containerColor = isDark ? 0x6d28d9 : 0xddd6fe;
+      const globeSurfaceColor = isDark ? 0x0d0d12 : 0xf4f4f7;
+      const gridWireColor = isDark ? 0x8b5cf6 : 0x6d28d9;
 
-    // 4. Outer Equatorial & Polar Orbital Rings
-    const orbitRingGeo = new THREE.TorusGeometry(GLOBE_RADIUS + 0.55, 0.022, 16, 128);
-    const orbitRingMat = new THREE.MeshBasicMaterial({
-      color: primaryColor,
-      transparent: true,
-      opacity: isDark ? 0.65 : 0.45,
-    });
-    const orbitRing1 = new THREE.Mesh(orbitRingGeo, orbitRingMat);
-    orbitRing1.rotation.x = Math.PI / 2.3;
-    orbitRing1.rotation.y = 0.3;
-    scene.add(orbitRing1);
-
-    const orbitRing2 = new THREE.Mesh(
-      new THREE.TorusGeometry(GLOBE_RADIUS + 0.82, 0.015, 16, 128),
-      orbitRingMat
-    );
-    orbitRing2.rotation.x = -Math.PI / 3;
-    orbitRing2.rotation.z = 0.4;
-    scene.add(orbitRing2);
-
-    // 5. Radial 3D Beacons on the Globe Surface
-    const beaconGroups: THREE.Group[] = [];
-    const pulseRings: THREE.Mesh[] = [];
-    const hitTargets: THREE.Object3D[] = [];
-
-    EXPERIENCE_MILESTONES.forEach((milestone, idx) => {
-      const surfacePos = latLonToVector3(milestone.lat, milestone.lon, GLOBE_RADIUS);
-      const normal = surfacePos.clone().normalize();
-
-      const beaconGroup = new THREE.Group();
-      beaconGroup.position.copy(surfacePos);
-      beaconGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
-      beaconGroup.userData = { milestoneIndex: idx };
-
-      const padGeo = new THREE.CylinderGeometry(0.19, 0.23, 0.09, 32);
-      const padMat = new THREE.MeshStandardMaterial({
-        color: containerColor,
-        roughness: 0.3,
+      // 1. Core Globe Sphere (Lambert shader for fast compilation)
+      const sphereGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 28, 28);
+      const sphereMat = new THREE.MeshLambertMaterial({
+        color: globeSurfaceColor,
       });
-      const pad = new THREE.Mesh(padGeo, padMat);
-      pad.position.y = 0.045;
-      pad.userData = { milestoneIndex: idx };
-      beaconGroup.add(pad);
+      const globeMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      globePivot.add(globeMesh);
 
-      const stemGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.55, 16);
+      // 2. Geodesic Wireframe Shell
+      const wireGeo = new THREE.IcosahedronGeometry(GLOBE_RADIUS + 0.015, 2);
+      const wireMat = new THREE.MeshBasicMaterial({
+        color: gridWireColor,
+        wireframe: true,
+        transparent: true,
+        opacity: isDark ? 0.44 : 0.34,
+      });
+      const wireMesh = new THREE.Mesh(wireGeo, wireMat);
+      globePivot.add(wireMesh);
+
+      // 3. Spherical Surface Dot Constellation on Globe
+      const dotCount = 140;
+      const dotPositions = new Float32Array(dotCount * 3);
+      for (let i = 0; i < dotCount; i++) {
+        const phi = Math.acos(2 * Math.random() - 1);
+        const theta = Math.random() * Math.PI * 2;
+        const r = GLOBE_RADIUS + 0.03;
+        dotPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        dotPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        dotPositions[i * 3 + 2] = r * Math.cos(phi);
+      }
+      const surfaceDotsGeo = new THREE.BufferGeometry();
+      surfaceDotsGeo.setAttribute('position', new THREE.BufferAttribute(dotPositions, 3));
+      const surfaceDotsMat = new THREE.PointsMaterial({
+        color: isDark ? 0xc4b5fd : 0x5b21b6,
+        size: 0.045,
+        transparent: true,
+        opacity: isDark ? 0.72 : 0.5,
+      });
+      const surfaceDots = new THREE.Points(surfaceDotsGeo, surfaceDotsMat);
+      globePivot.add(surfaceDots);
+
+      // 4. Outer Equatorial & Polar Orbital Rings
+      const orbitRingGeo = new THREE.TorusGeometry(GLOBE_RADIUS + 0.55, 0.022, 12, 64);
+      const orbitRingMat = new THREE.MeshBasicMaterial({
+        color: primaryColor,
+        transparent: true,
+        opacity: isDark ? 0.65 : 0.45,
+      });
+      const orbitRing1 = new THREE.Mesh(orbitRingGeo, orbitRingMat);
+      orbitRing1.rotation.x = Math.PI / 2.3;
+      orbitRing1.rotation.y = 0.3;
+      scene.add(orbitRing1);
+
+      const orbitRing2Geo = new THREE.TorusGeometry(GLOBE_RADIUS + 0.82, 0.015, 12, 64);
+      const orbitRing2 = new THREE.Mesh(orbitRing2Geo, orbitRingMat);
+      orbitRing2.rotation.x = -Math.PI / 3;
+      orbitRing2.rotation.z = 0.4;
+      scene.add(orbitRing2);
+
+      // 5. Radial 3D Beacons on the Globe Surface (Shared Geometries & Materials)
+      const beaconGroups: THREE_TYPES.Group[] = [];
+      const pulseRings: THREE_TYPES.Mesh[] = [];
+      const hitTargets: THREE_TYPES.Object3D[] = [];
+
+      const padGeo = new THREE.CylinderGeometry(0.19, 0.23, 0.09, 16);
+      const padMat = new THREE.MeshLambertMaterial({ color: containerColor });
+      const stemGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.55, 8);
       const stemMat = new THREE.MeshBasicMaterial({ color: primaryColor });
-      const stem = new THREE.Mesh(stemGeo, stemMat);
-      stem.position.y = 0.3;
-      beaconGroup.add(stem);
-
       const headGeo = new THREE.OctahedronGeometry(0.22, 0);
-      const headMat = new THREE.MeshStandardMaterial({
+      const headMat = new THREE.MeshPhongMaterial({
         color: primaryColor,
         emissive: isDark ? 0x7c3aed : 0x4c1d95,
-        emissiveIntensity: isDark ? 0.65 : 0.25,
-        roughness: 0.2,
-        metalness: 0.2,
+        flatShading: true,
       });
-      const head = new THREE.Mesh(headGeo, headMat);
-      head.position.y = 0.65;
-      head.name = 'head';
-      head.userData = { milestoneIndex: idx };
-      beaconGroup.add(head);
-      hitTargets.push(head, pad);
+      const baseRingGeo = new THREE.RingGeometry(0.22, 0.34, 24);
+      baseRingGeo.rotateX(-Math.PI / 2);
 
-      const ringGeo = new THREE.RingGeometry(0.22, 0.34, 36);
-      ringGeo.rotateX(-Math.PI / 2);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: primaryColor,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.85,
+      EXPERIENCE_MILESTONES.forEach((milestone, idx) => {
+        const surfacePos = latLonToVector3(milestone.lat, milestone.lon, GLOBE_RADIUS);
+        const normal = surfacePos.clone().normalize();
+
+        const beaconGroup = new THREE.Group();
+        beaconGroup.position.copy(surfacePos);
+        beaconGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+        beaconGroup.userData = { milestoneIndex: idx };
+
+        const pad = new THREE.Mesh(padGeo, padMat);
+        pad.position.y = 0.045;
+        pad.userData = { milestoneIndex: idx };
+        beaconGroup.add(pad);
+
+        const stem = new THREE.Mesh(stemGeo, stemMat);
+        stem.position.y = 0.3;
+        beaconGroup.add(stem);
+
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.y = 0.65;
+        head.name = 'head';
+        head.userData = { milestoneIndex: idx };
+        beaconGroup.add(head);
+        hitTargets.push(head, pad);
+
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: primaryColor,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.85,
+        });
+        const pulseRing = new THREE.Mesh(baseRingGeo, ringMat);
+        pulseRing.position.y = 0.03;
+        beaconGroup.add(pulseRing);
+        pulseRings.push(pulseRing);
+
+        globePivot.add(beaconGroup);
+        beaconGroups.push(beaconGroup);
       });
-      const pulseRing = new THREE.Mesh(ringGeo, ringMat);
-      pulseRing.position.y = 0.03;
-      beaconGroup.add(pulseRing);
-      pulseRings.push(pulseRing);
 
-      globePivot.add(beaconGroup);
-      beaconGroups.push(beaconGroup);
-    });
-
-    // 6. 3D Great-Circle Flight Arcs Connecting Beacons Around the Globe
-    const travelerDots: { mesh: THREE.Mesh; curve: THREE.CubicBezierCurve3; offset: number }[] = [];
-
-    for (let i = 0; i < EXPERIENCE_MILESTONES.length; i++) {
-      const m1 = EXPERIENCE_MILESTONES[i];
-      const m2 = EXPERIENCE_MILESTONES[(i + 1) % EXPERIENCE_MILESTONES.length];
-
-      const start = latLonToVector3(m1.lat, m1.lon, GLOBE_RADIUS + 0.58);
-      const end = latLonToVector3(m2.lat, m2.lon, GLOBE_RADIUS + 0.58);
-
-      const ctrl1 = start.clone().lerp(end, 0.33).normalize().multiplyScalar(GLOBE_RADIUS + 1.15);
-      const ctrl2 = start.clone().lerp(end, 0.66).normalize().multiplyScalar(GLOBE_RADIUS + 1.15);
-
-      const curve = new THREE.CubicBezierCurve3(start, ctrl1, ctrl2, end);
-      const tubeGeo = new THREE.TubeGeometry(curve, 44, 0.024, 10, false);
+      // 6. 3D Great-Circle Flight Arcs Connecting Beacons Around the Globe
+      const travelerDots: {
+        mesh: THREE_TYPES.Mesh;
+        curve: THREE_TYPES.CubicBezierCurve3;
+        offset: number;
+      }[] = [];
+      const dotGeo = new THREE.SphereGeometry(0.08, 10, 10);
+      const dotMat = new THREE.MeshBasicMaterial({
+        color: isDark ? 0xffffff : 0x4c1d95,
+      });
       const tubeMat = new THREE.MeshBasicMaterial({
         color: primaryColor,
         transparent: true,
         opacity: isDark ? 0.68 : 0.52,
       });
-      const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
-      globePivot.add(tubeMesh);
 
-      const dotGeo = new THREE.SphereGeometry(0.08, 16, 16);
-      const dotMat = new THREE.MeshBasicMaterial({
-        color: isDark ? 0xffffff : 0x4c1d95,
-      });
-      const dotMesh = new THREE.Mesh(dotGeo, dotMat);
-      globePivot.add(dotMesh);
-      travelerDots.push({ mesh: dotMesh, offset: i * 0.25, curve });
-    }
+      for (let i = 0; i < EXPERIENCE_MILESTONES.length; i++) {
+        const m1 = EXPERIENCE_MILESTONES[i];
+        const m2 = EXPERIENCE_MILESTONES[(i + 1) % EXPERIENCE_MILESTONES.length];
 
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-    let isDragging = false;
-    let prevX = 0;
-    let prevY = 0;
-    let dragDist = 0;
+        const start = latLonToVector3(m1.lat, m1.lon, GLOBE_RADIUS + 0.58);
+        const end = latLonToVector3(m2.lat, m2.lon, GLOBE_RADIUS + 0.58);
 
-    const onPointerDown = (e: PointerEvent) => {
-      isDragging = true;
-      prevX = e.clientX;
-      prevY = e.clientY;
-      dragDist = 0;
-    };
+        const ctrl1 = start.clone().lerp(end, 0.33).normalize().multiplyScalar(GLOBE_RADIUS + 1.15);
+        const ctrl2 = start.clone().lerp(end, 0.66).normalize().multiplyScalar(GLOBE_RADIUS + 1.15);
 
-    const onPointerMove = (e: PointerEvent) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        const curve = new THREE.CubicBezierCurve3(start, ctrl1, ctrl2, end);
+        const tubeGeo = new THREE.TubeGeometry(curve, 24, 0.024, 6, false);
+        const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+        globePivot.add(tubeMesh);
 
-      if (isDragging && globePivotRef.current) {
-        const dx = e.clientX - prevX;
-        const dy = e.clientY - prevY;
-        dragDist += Math.abs(dx) + Math.abs(dy);
-        globePivotRef.current.rotation.y += dx * 0.007;
-        globePivotRef.current.rotation.x = THREE.MathUtils.clamp(
-          globePivotRef.current.rotation.x + dy * 0.005,
-          -0.8,
-          0.8
-        );
+        const dotMesh = new THREE.Mesh(dotGeo, dotMat);
+        globePivot.add(dotMesh);
+        travelerDots.push({ mesh: dotMesh, offset: i * 0.25, curve });
+      }
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      let isDragging = false;
+      let prevX = 0;
+      let prevY = 0;
+      let dragDist = 0;
+      let lastInteractionTime = 0;
+
+      const onPointerDown = (e: PointerEvent) => {
+        isDragging = true;
+        lastInteractionTime = performance.now();
         prevX = e.clientX;
         prevY = e.clientY;
-      }
-    };
+        dragDist = 0;
+      };
 
-    const onPointerUp = () => {
-      if (isDragging && dragDist < 8) {
-        raycaster.setFromCamera(pointer, camera);
-        const hits = raycaster.intersectObjects(hitTargets, false);
-        if (hits.length > 0) {
-          const idx = hits[0].object.userData?.milestoneIndex;
-          if (typeof idx === 'number') {
-            flyToMilestone(idx);
+      const onPointerMove = (e: PointerEvent) => {
+        if (!isDragging) return;
+        lastInteractionTime = performance.now();
+        const rect = renderer.domElement.getBoundingClientRect();
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        if (globePivotRef.current) {
+          const dx = e.clientX - prevX;
+          const dy = e.clientY - prevY;
+          dragDist += Math.abs(dx) + Math.abs(dy);
+          globePivotRef.current.rotation.y += dx * 0.007;
+          globePivotRef.current.rotation.x = THREE.MathUtils.clamp(
+            globePivotRef.current.rotation.x + dy * 0.005,
+            -0.8,
+            0.8
+          );
+          prevX = e.clientX;
+          prevY = e.clientY;
+        }
+      };
+
+      const onPointerUp = (e: PointerEvent) => {
+        if (isDragging && dragDist < 8) {
+          const rect = renderer.domElement.getBoundingClientRect();
+          pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(pointer, camera);
+          const hits = raycaster.intersectObjects(hitTargets, false);
+          if (hits.length > 0) {
+            const idx = hits[0].object.userData?.milestoneIndex;
+            if (typeof idx === 'number') {
+              flyToMilestone(idx);
+            }
           }
         }
+        isDragging = false;
+      };
+
+      const domElem = renderer.domElement;
+      domElem.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('pointerup', onPointerUp);
+
+      const handleResize = () => {
+        if (!container) return;
+        const w = container.clientWidth || 560;
+        const h = container.clientHeight || 430;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      };
+      window.addEventListener('resize', handleResize, { passive: true });
+
+      beaconGroupsRef.current = beaconGroups;
+
+      const initialMilestone = EXPERIENCE_MILESTONES[activeIndexRef.current];
+      if (initialMilestone) {
+        globePivot.rotation.y = -THREE.MathUtils.degToRad(initialMilestone.lon);
+        globePivot.rotation.x = THREE.MathUtils.degToRad(initialMilestone.lat * 0.65);
       }
-      isDragging = false;
-    };
+      beaconGroups.forEach((g, idx) => {
+        const s = idx === activeIndexRef.current ? 1.38 : 1;
+        g.scale.set(s, s, s);
+      });
 
-    const domElem = renderer.domElement;
-    domElem.addEventListener('pointerdown', onPointerDown);
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
+      let animId = 0;
+      const clock = new THREE.Clock();
+      let lastRenderTime = 0;
 
-    const handleResize = () => {
-      if (!container) return;
-      const w = container.clientWidth || 560;
-      const h = container.clientHeight || 430;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    };
-    window.addEventListener('resize', handleResize);
+      const animate = (now: number) => {
+        animId = requestAnimationFrame(animate);
+        if (!isVisible || document.hidden) return;
 
-    beaconGroupsRef.current = beaconGroups;
+        const isInteracting = isDragging || now - lastInteractionTime < 1500;
+        const minInterval = isInteracting ? 14 : 32;
+        if (now - lastRenderTime < minInterval) return;
+        lastRenderTime = now;
 
-    const initialMilestone = EXPERIENCE_MILESTONES[activeIndexRef.current];
-    if (initialMilestone) {
-      globePivot.rotation.y = -THREE.MathUtils.degToRad(initialMilestone.lon);
-      globePivot.rotation.x = THREE.MathUtils.degToRad(initialMilestone.lat * 0.65);
-    }
-    beaconGroups.forEach((g, idx) => {
-      const s = idx === activeIndexRef.current ? 1.38 : 1;
-      g.scale.set(s, s, s);
-    });
+        const t = clock.getElapsedTime();
 
-    let animId = 0;
-    const clock = new THREE.Clock();
-
-    const animate = () => {
-      animId = requestAnimationFrame(animate);
-      const t = clock.getElapsedTime();
-
-      if (!isDragging) {
-        globePivot.rotation.y += 0.0022;
-      }
-
-      orbitRing1.rotation.z = t * 0.22;
-      orbitRing2.rotation.y = -t * 0.18;
-
-      beaconGroups.forEach((group, idx) => {
-        const head = group.getObjectByName('head');
-        if (head) {
-          head.rotation.y = t * 1.8 + idx;
-          head.position.y = 0.65 + Math.sin(t * 2.5 + idx) * 0.06;
+        if (!isDragging) {
+          globePivot.rotation.y += 0.0032;
         }
-      });
 
-      pulseRings.forEach((ring, idx) => {
-        const phase = (t * 0.9 + idx * 0.3) % 1;
-        const scale = 1 + phase * 1.9;
-        ring.scale.set(scale, scale, 1);
-        const mat = ring.material as THREE.MeshBasicMaterial;
-        mat.opacity = (1 - phase) * (idx === activeIndexRef.current ? 0.95 : 0.45);
-      });
+        orbitRing1.rotation.z = t * 0.22;
+        orbitRing2.rotation.y = -t * 0.18;
 
-      travelerDots.forEach((td) => {
-        const progress = (t * 0.24 + td.offset) % 1;
-        const pos = td.curve.getPointAt(progress);
-        td.mesh.position.copy(pos);
-      });
+        beaconGroups.forEach((group, idx) => {
+          const head = group.getObjectByName('head');
+          if (head) {
+            head.rotation.y = t * 1.8 + idx;
+            head.position.y = 0.65 + Math.sin(t * 2.5 + idx) * 0.06;
+          }
+        });
 
-      renderer.render(scene, camera);
+        pulseRings.forEach((ring, idx) => {
+          const phase = (t * 0.9 + idx * 0.3) % 1;
+          const scale = 1 + phase * 1.9;
+          ring.scale.set(scale, scale, 1);
+          const mat = ring.material as THREE_TYPES.MeshBasicMaterial;
+          mat.opacity = (1 - phase) * (idx === activeIndexRef.current ? 0.95 : 0.45);
+        });
+
+        travelerDots.forEach((td) => {
+          const progress = (t * 0.24 + td.offset) % 1;
+          const pos = td.curve.getPointAt(progress);
+          td.mesh.position.copy(pos);
+        });
+
+        renderer.render(scene, camera);
+      };
+
+      animId = requestAnimationFrame(animate);
+
+      cleanupScene = () => {
+        cancelAnimationFrame(animId);
+        domElem.removeEventListener('pointerdown', onPointerDown);
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('resize', handleResize);
+        renderer.dispose();
+      };
     };
 
-    animate();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        isVisible = entry.isIntersecting;
+        if (entry.isIntersecting && !hasInitialized) {
+          initGlobe();
+        }
+      },
+      { rootMargin: '120px 0px', threshold: 0.01 }
+    );
+    observer.observe(container);
 
     return () => {
-      cancelAnimationFrame(animId);
-      domElem.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('resize', handleResize);
-      renderer.dispose();
+      isDisposed = true;
+      observer.disconnect();
+      if (cleanupScene) cleanupScene();
     };
   }, [resolvedTheme, flyToMilestone]);
 
