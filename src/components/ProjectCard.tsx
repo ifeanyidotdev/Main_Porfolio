@@ -223,6 +223,11 @@ const ProjectCard: React.FC<ProjectProps> = ({
                   ref={imgRef}
                   src={project.image}
                   alt={project.title}
+                  width={800}
+                  height={450}
+                  loading="lazy"
+                  decoding="async"
+                  {...({ fetchpriority: 'low' } as React.ImgHTMLAttributes<HTMLImageElement>)}
                   onLoad={(e) => {
                     if (e.currentTarget.naturalWidth > 1) {
                       setImageLoaded(true);

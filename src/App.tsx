@@ -1,41 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import ExperienceMap3D from './components/ExperienceMap3D';
-import Projects from './components/Projects';
-import Skills from './components/Skills';
-import About from './components/About';
-import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Cursor from './components/Cursor';
 import { ThemeProvider } from './utils/theme';
+
+const ExperienceMap3D = lazy(() => import('./components/ExperienceMap3D'));
+const Projects = lazy(() => import('./components/Projects'));
+const Skills = lazy(() => import('./components/Skills'));
+const About = lazy(() => import('./components/About'));
+const Contact = lazy(() => import('./components/Contact'));
 
 function App() {
   const [activeSection, setActiveSection] = useState('home');
 
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = ['home', 'experience', 'projects', 'skills', 'about', 'contact'];
-      const scrollPosition = window.scrollY;
-
-      sections.forEach((section) => {
-        const element = document.getElementById(section);
-        if (element) {
-          const offsetTop = element.offsetTop;
-          const height = element.offsetHeight;
-
-          if (
-            scrollPosition >= offsetTop - 160 &&
-            scrollPosition < offsetTop + height - 160
-          ) {
-            setActiveSection(section);
+    const sectionIds = ['home', 'experience', 'projects', 'skills', 'about', 'contact'];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.target.id) {
+            setActiveSection(entry.target.id);
           }
-        }
+        });
+      },
+      { rootMargin: '-25% 0px -55% 0px', threshold: 0 }
+    );
+
+    const observeSections = () => {
+      sectionIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
       });
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    observeSections();
+    const timer = window.setTimeout(observeSections, 600);
+
+    return () => {
+      window.clearTimeout(timer);
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -53,11 +58,13 @@ function App() {
 
         <main className="relative z-10">
           <Hero />
-          <ExperienceMap3D />
-          <Projects />
-          <Skills />
-          <About />
-          <Contact />
+          <Suspense fallback={<div className="min-h-[420px]" />}>
+            <ExperienceMap3D />
+            <Projects />
+            <Skills />
+            <About />
+            <Contact />
+          </Suspense>
         </main>
 
         <Footer />

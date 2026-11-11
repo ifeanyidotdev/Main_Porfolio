@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import * as THREE from 'three';
+import type * as THREE_TYPES from 'three';
 import { Github, Linkedin, Mail, ArrowUpRight, X } from 'lucide-react';
 import { SOCIAL_LINKS } from '../utils/constant';
 import { useTheme } from '../utils/theme';
@@ -59,202 +59,266 @@ const Hero: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
-  // Interactive Three.js 3D Cobalt-Sky Architectural Prism Sculpture
+  // Interactive Three.js 3D Architectural Prism Sculpture (Idle-Initialized & Viewport-Gated)
   useEffect(() => {
     const container = canvasMountRef.current;
     if (!container) return;
 
-    const isDark = resolvedTheme === 'dark';
-
-    const scene = new THREE.Scene();
-    const width = container.clientWidth || 420;
-    const height = container.clientHeight || 420;
-
-    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
-    camera.position.set(0, 0.2, 6.2);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    container.innerHTML = '';
-    container.appendChild(renderer.domElement);
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, isDark ? 1.25 : 1.75);
-    scene.add(ambientLight);
-
-    const keyLight = new THREE.DirectionalLight(0xffffff, isDark ? 2.8 : 2.1);
-    keyLight.position.set(5, 6, 6);
-    scene.add(keyLight);
-
-    const rimLight = new THREE.DirectionalLight(isDark ? 0xa78bfa : 0x7c3aed, 2.8);
-    rimLight.position.set(-6, -4, 4);
-    scene.add(rimLight);
-
-    const indigoLight = new THREE.PointLight(0x6366f1, isDark ? 2.2 : 1.1, 12);
-    indigoLight.position.set(3, -3, 3);
-    scene.add(indigoLight);
-
-    const rootGroup = new THREE.Group();
-    scene.add(rootGroup);
-
-    // 1. Inner Faceted Octahedral Core
-    const coreGeo = new THREE.OctahedronGeometry(1.38, 0);
-    const coreMat = new THREE.MeshStandardMaterial({
-      color: isDark ? 0x6d28d9 : 0x5b21b6,
-      emissive: isDark ? 0x4c1d95 : 0x3b0764,
-      emissiveIntensity: isDark ? 0.55 : 0.25,
-      roughness: 0.18,
-      metalness: 0.35,
-      flatShading: true,
-    });
-    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-    rootGroup.add(coreMesh);
-
-    // 2. Outer Geodesic Wireframe Lattice
-    const cageGeo = new THREE.OctahedronGeometry(1.78, 1);
-    const cageMat = new THREE.MeshBasicMaterial({
-      color: isDark ? 0xa78bfa : 0x6d28d9,
-      wireframe: true,
-      transparent: true,
-      opacity: isDark ? 0.62 : 0.45,
-    });
-    const cageMesh = new THREE.Mesh(cageGeo, cageMat);
-    rootGroup.add(cageMesh);
-
-    // 3. Dual Gyroscopic Orbital Rings
-    const ringGeo = new THREE.TorusGeometry(2.3, 0.02, 16, 128);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: isDark ? 0xa78bfa : 0x6d28d9,
-      transparent: true,
-      opacity: isDark ? 0.72 : 0.52,
-    });
-    const ring1 = new THREE.Mesh(ringGeo, ringMat);
-    ring1.rotation.x = Math.PI / 2.4;
-    rootGroup.add(ring1);
-
-    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(2.55, 0.015, 16, 128), ringMat);
-    ring2.rotation.y = Math.PI / 3;
-    ring2.rotation.x = -Math.PI / 4;
-    rootGroup.add(ring2);
-
-    // 4. Interactive Orbiting Nodes
-    const nodeGeo = new THREE.OctahedronGeometry(0.16, 0);
-    const nodeMat = new THREE.MeshStandardMaterial({
-      color: isDark ? 0xffffff : 0x4c1d95,
-      emissive: 0x8b5cf6,
-      emissiveIntensity: 0.8,
-      roughness: 0.15,
-    });
-    const nodes: THREE.Mesh[] = [];
-    for (let i = 0; i < 4; i++) {
-      const node = new THREE.Mesh(nodeGeo, nodeMat);
-      rootGroup.add(node);
-      nodes.push(node);
-    }
-
-    // 5. 3D Starfield Particle Constellation
-    const particleCount = 120;
-    const positions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      const r = 2.5 + Math.random() * 1.8;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = r * Math.cos(phi);
-    }
-    const particleGeo = new THREE.BufferGeometry();
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const particleMat = new THREE.PointsMaterial({
-      color: isDark ? 0xc4b5fd : 0x6d28d9,
-      size: 0.052,
-      transparent: true,
-      opacity: isDark ? 0.75 : 0.55,
-    });
-    const particleCloud = new THREE.Points(particleGeo, particleMat);
-    rootGroup.add(particleCloud);
-
-    let targetRotX = 0;
-    let targetRotY = 0;
-    const spinBoost = { value: 1 };
-
-    const handlePointerMove = (e: PointerEvent) => {
-      const normX = (e.clientX / window.innerWidth) * 2 - 1;
-      const normY = (e.clientY / window.innerHeight) * 2 - 1;
-      targetRotY = normX * 0.75;
-      targetRotX = normY * 0.55;
-    };
-
-    const handleCanvasClick = () => {
-      gsap.fromTo(
-        spinBoost,
-        { value: 6 },
-        { value: 1, duration: 1.2, ease: 'power3.out' }
-      );
-      gsap.fromTo(
-        coreMesh.scale,
-        { x: 1.28, y: 1.28, z: 1.28 },
-        { x: 1, y: 1, z: 1, duration: 0.9, ease: 'elastic.out(1, 0.4)' }
-      );
-    };
-
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
-    const domElem = renderer.domElement;
-    domElem.addEventListener('click', handleCanvasClick);
-
-    const handleResize = () => {
-      if (!container) return;
-      const w = container.clientWidth || 420;
-      const h = container.clientHeight || 420;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    };
-    window.addEventListener('resize', handleResize);
-
+    let isDisposed = false;
+    let isVisible = true;
     let frameId = 0;
-    const clock = new THREE.Clock();
+    let cleanupScene: (() => void) | null = null;
 
-    const animate = () => {
-      frameId = requestAnimationFrame(animate);
-      const t = clock.getElapsedTime();
+    const initScene = async () => {
+      if (isDisposed || !container) return;
+      const THREE = await import('../utils/three-lite');
+      if (isDisposed || !container) return;
 
-      coreMesh.rotation.y += 0.008 * spinBoost.value;
-      coreMesh.rotation.x += 0.005 * spinBoost.value;
+      const isDark = resolvedTheme === 'dark';
 
-      cageMesh.rotation.y -= 0.005 * spinBoost.value;
-      cageMesh.rotation.z += 0.004 * spinBoost.value;
+      const scene = new THREE.Scene();
+      const width = container.clientWidth || 420;
+      const height = container.clientHeight || 420;
 
-      particleCloud.rotation.y = t * 0.08;
-      particleCloud.rotation.x = Math.sin(t * 0.2) * 0.15;
+      const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
+      camera.position.set(0, 0.2, 6.2);
 
-      ring1.rotation.z = t * 0.35;
-      ring2.rotation.z = -t * 0.28;
+      let renderer: THREE_TYPES.WebGLRenderer;
+      try {
+        renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+        });
+      } catch {
+        return;
+      }
 
-      nodes.forEach((node, idx) => {
-        const angle = t * 0.85 + (idx * Math.PI) / 2;
-        node.position.set(
-          Math.cos(angle) * 2.3,
-          Math.sin(angle * 1.3) * 0.85,
-          Math.sin(angle) * 2.3
-        );
-        node.rotation.y = t * 2;
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      container.innerHTML = '';
+      container.appendChild(renderer.domElement);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, isDark ? 1.3 : 1.8);
+      scene.add(ambientLight);
+
+      const keyLight = new THREE.DirectionalLight(0xffffff, isDark ? 2.6 : 2.0);
+      keyLight.position.set(5, 6, 6);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.DirectionalLight(isDark ? 0xa78bfa : 0x7c3aed, 2.5);
+      rimLight.position.set(-6, -4, 4);
+      scene.add(rimLight);
+
+      const rootGroup = new THREE.Group();
+      scene.add(rootGroup);
+
+      // 1. Inner Faceted Octahedral Core
+      const coreGeo = new THREE.OctahedronGeometry(1.38, 0);
+      const coreMat = new THREE.MeshPhongMaterial({
+        color: isDark ? 0x6d28d9 : 0x5b21b6,
+        emissive: isDark ? 0x4c1d95 : 0x3b0764,
+        specular: 0xa78bfa,
+        shininess: 65,
+        flatShading: true,
       });
+      const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+      rootGroup.add(coreMesh);
 
-      rootGroup.rotation.x += (targetRotX - rootGroup.rotation.x) * 0.07;
-      rootGroup.rotation.y += (targetRotY - rootGroup.rotation.y) * 0.07;
+      // 2. Outer Geodesic Wireframe Lattice
+      const cageGeo = new THREE.OctahedronGeometry(1.78, 1);
+      const cageMat = new THREE.MeshBasicMaterial({
+        color: isDark ? 0xa78bfa : 0x6d28d9,
+        wireframe: true,
+        transparent: true,
+        opacity: isDark ? 0.62 : 0.45,
+      });
+      const cageMesh = new THREE.Mesh(cageGeo, cageMat);
+      rootGroup.add(cageMesh);
 
-      renderer.render(scene, camera);
+      // 3. Dual Gyroscopic Orbital Rings
+      const ringGeo = new THREE.TorusGeometry(2.3, 0.02, 12, 64);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: isDark ? 0xa78bfa : 0x6d28d9,
+        transparent: true,
+        opacity: isDark ? 0.72 : 0.52,
+      });
+      const ring1 = new THREE.Mesh(ringGeo, ringMat);
+      ring1.rotation.x = Math.PI / 2.4;
+      rootGroup.add(ring1);
+
+      const ring2Geo = new THREE.TorusGeometry(2.55, 0.015, 12, 64);
+      const ring2 = new THREE.Mesh(ring2Geo, ringMat);
+      ring2.rotation.y = Math.PI / 3;
+      ring2.rotation.x = -Math.PI / 4;
+      rootGroup.add(ring2);
+
+      // 4. Interactive Orbiting Nodes
+      const nodeGeo = new THREE.OctahedronGeometry(0.16, 0);
+      const nodeMat = new THREE.MeshBasicMaterial({
+        color: isDark ? 0xc4b5fd : 0x6d28d9,
+      });
+      const nodes: THREE_TYPES.Mesh[] = [];
+      for (let i = 0; i < 4; i++) {
+        const node = new THREE.Mesh(nodeGeo, nodeMat);
+        rootGroup.add(node);
+        nodes.push(node);
+      }
+
+      // 5. 3D Starfield Particle Constellation
+      const particleCount = 90;
+      const positions = new Float32Array(particleCount * 3);
+      for (let i = 0; i < particleCount; i++) {
+        const r = 2.5 + Math.random() * 1.8;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        positions[i * 3 + 2] = r * Math.cos(phi);
+      }
+      const particleGeo = new THREE.BufferGeometry();
+      particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const particleMat = new THREE.PointsMaterial({
+        color: isDark ? 0xc4b5fd : 0x6d28d9,
+        size: 0.052,
+        transparent: true,
+        opacity: isDark ? 0.75 : 0.55,
+      });
+      const particleCloud = new THREE.Points(particleGeo, particleMat);
+      rootGroup.add(particleCloud);
+
+      let targetRotX = 0;
+      let targetRotY = 0;
+      let lastInteractionTime = performance.now();
+      const spinBoost = { value: 1 };
+
+      const handlePointerMove = (e: PointerEvent) => {
+        lastInteractionTime = performance.now();
+        const normX = (e.clientX / window.innerWidth) * 2 - 1;
+        const normY = (e.clientY / window.innerHeight) * 2 - 1;
+        targetRotY = normX * 0.75;
+        targetRotX = normY * 0.55;
+      };
+
+      const handleCanvasClick = () => {
+        lastInteractionTime = performance.now();
+        gsap.fromTo(
+          spinBoost,
+          { value: 6 },
+          { value: 1, duration: 1.2, ease: 'power3.out' }
+        );
+        gsap.fromTo(
+          coreMesh.scale,
+          { x: 1.28, y: 1.28, z: 1.28 },
+          { x: 1, y: 1, z: 1, duration: 0.9, ease: 'elastic.out(1, 0.4)' }
+        );
+      };
+
+      window.addEventListener('pointermove', handlePointerMove, { passive: true });
+      const domElem = renderer.domElement;
+      domElem.addEventListener('click', handleCanvasClick);
+
+      const handleResize = () => {
+        if (!container) return;
+        const w = container.clientWidth || 420;
+        const h = container.clientHeight || 420;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      };
+      window.addEventListener('resize', handleResize, { passive: true });
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          isVisible = entries[0]?.isIntersecting ?? true;
+        },
+        { threshold: 0.05 }
+      );
+      observer.observe(container);
+
+      const clock = new THREE.Clock();
+      let lastRenderTime = 0;
+
+      const animate = (now: number) => {
+        frameId = requestAnimationFrame(animate);
+        if (!isVisible || document.hidden) return;
+
+        // Render at 60fps during active interaction, ~30fps when idle to keep main thread unblocked
+        const isInteracting = now - lastInteractionTime < 1500;
+        const minInterval = isInteracting ? 14 : 32;
+        if (now - lastRenderTime < minInterval) return;
+        lastRenderTime = now;
+
+        const t = clock.getElapsedTime();
+
+        coreMesh.rotation.y += 0.011 * spinBoost.value;
+        coreMesh.rotation.x += 0.007 * spinBoost.value;
+
+        cageMesh.rotation.y -= 0.007 * spinBoost.value;
+        cageMesh.rotation.z += 0.005 * spinBoost.value;
+
+        particleCloud.rotation.y = t * 0.08;
+        particleCloud.rotation.x = Math.sin(t * 0.2) * 0.15;
+
+        ring1.rotation.z = t * 0.35;
+        ring2.rotation.z = -t * 0.28;
+
+        nodes.forEach((node, idx) => {
+          const angle = t * 0.85 + (idx * Math.PI) / 2;
+          node.position.set(
+            Math.cos(angle) * 2.3,
+            Math.sin(angle * 1.3) * 0.85,
+            Math.sin(angle) * 2.3
+          );
+          node.rotation.y = t * 2;
+        });
+
+        rootGroup.rotation.x += (targetRotX - rootGroup.rotation.x) * 0.09;
+        rootGroup.rotation.y += (targetRotY - rootGroup.rotation.y) * 0.09;
+
+        renderer.render(scene, camera);
+      };
+
+      frameId = requestAnimationFrame(animate);
+
+      cleanupScene = () => {
+        cancelAnimationFrame(frameId);
+        observer.disconnect();
+        window.removeEventListener('pointermove', handlePointerMove);
+        domElem.removeEventListener('click', handleCanvasClick);
+        window.removeEventListener('resize', handleResize);
+        coreGeo.dispose();
+        coreMat.dispose();
+        cageGeo.dispose();
+        cageMat.dispose();
+        ringGeo.dispose();
+        ring2Geo.dispose();
+        ringMat.dispose();
+        nodeGeo.dispose();
+        nodeMat.dispose();
+        particleGeo.dispose();
+        particleMat.dispose();
+        renderer.dispose();
+      };
     };
 
-    animate();
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback;
+    const cancelRic = (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+
+    let idleId = 0;
+    let timerId = 0;
+
+    if (typeof ric === 'function') {
+      idleId = ric(initScene, { timeout: 300 });
+    } else {
+      timerId = window.setTimeout(initScene, 120);
+    }
 
     return () => {
-      cancelAnimationFrame(frameId);
-      window.removeEventListener('pointermove', handlePointerMove);
-      domElem.removeEventListener('click', handleCanvasClick);
-      window.removeEventListener('resize', handleResize);
-      renderer.dispose();
+      isDisposed = true;
+      if (idleId && typeof cancelRic === 'function') cancelRic(idleId);
+      if (timerId) window.clearTimeout(timerId);
+      if (cleanupScene) cleanupScene();
     };
   }, [resolvedTheme]);
 
