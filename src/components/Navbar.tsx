@@ -1,19 +1,34 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import gsap from 'gsap';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import {
+  Sun,
+  Moon,
+  ArrowUpRight,
+  Github,
+  Linkedin,
+  Mail,
+  X as XIcon,
+  Home,
+  Briefcase,
+  FolderGit2,
+  Cpu,
+  User,
+  Send,
+} from 'lucide-react';
 import { useTheme } from '../utils/theme';
+import { SOCIAL_LINKS } from '../utils/constant';
 
 interface NavbarProps {
   activeSection: string;
 }
 
 const navLinks = [
-  { name: 'Home', id: 'home' },
-  { name: 'Experience', id: 'experience' },
-  { name: 'Projects', id: 'projects' },
-  { name: 'Skills', id: 'skills' },
-  { name: 'About', id: 'about' },
-  { name: 'Contact', id: 'contact' },
+  { name: 'Home', id: 'home', num: '01', icon: Home },
+  { name: 'Experience', id: 'experience', num: '02', icon: Briefcase },
+  { name: 'Projects', id: 'projects', num: '03', icon: FolderGit2 },
+  { name: 'Skills', id: 'skills', num: '04', icon: Cpu },
+  { name: 'About', id: 'about', num: '05', icon: User },
+  { name: 'Contact', id: 'contact', num: '06', icon: Send },
 ];
 
 const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
@@ -25,6 +40,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
   const navContainerRef = useRef<HTMLDivElement>(null);
   const pillIndicatorRef = useRef<HTMLSpanElement>(null);
   const themeBtnRef = useRef<HTMLButtonElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
   const targetId = hoveredId ?? activeSection;
@@ -63,6 +79,53 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMenuOpen) {
+        setIsMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (!isMenuOpen || !mobileMenuRef.current) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        mobileMenuRef.current,
+        { opacity: 0, scale: 0.94, y: -10, transformOrigin: 'top right' },
+        { opacity: 1, scale: 1, y: 0, duration: 0.32, ease: 'back.out(1.5)' }
+      );
+
+      gsap.fromTo(
+        '.mobile-nav-item',
+        { opacity: 0, x: -16, scale: 0.96 },
+        {
+          opacity: 1,
+          x: 0,
+          scale: 1,
+          duration: 0.34,
+          stagger: 0.045,
+          ease: 'power3.out',
+          delay: 0.05,
+        }
+      );
+
+      gsap.fromTo(
+        '.mobile-nav-footer',
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out', delay: 0.22 }
+      );
+    }, mobileMenuRef);
+
+    return () => ctx.revert();
+  }, [isMenuOpen]);
 
   const handleThemeClick = () => {
     if (themeBtnRef.current) {
@@ -144,7 +207,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
             ref={themeBtnRef}
             type="button"
             onClick={handleThemeClick}
-            className="h-10 w-10 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
+            className="h-10 w-10 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill active:scale-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
             aria-label={nextThemeLabel}
             title={nextThemeLabel}
           >
@@ -155,39 +218,157 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
             )}
           </button>
 
+          {/* Animated Morphing Mobile Menu Button */}
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden h-10 w-10 rounded-full flex items-center justify-center bg-surface-elevated text-content-primary border border-brand-border focus:outline-none"
-            aria-label="Toggle navigation menu"
+            className={`md:hidden relative h-10 w-10 rounded-full flex items-center justify-center border active:scale-95 transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary ${
+              isMenuOpen
+                ? 'bg-purple-700 bg-brand-fill text-white border-brand-fill shadow-md'
+                : 'bg-surface-elevated text-content-primary border-brand-border hover:border-brand-primary'
+            }`}
+            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation-drawer"
           >
-            {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            <div className="w-4 h-3.5 relative flex flex-col justify-between items-center">
+              <span
+                className={`block h-[2px] w-4 rounded-full bg-current transition-all duration-300 origin-center ${
+                  isMenuOpen ? 'translate-y-[6px] rotate-45' : ''
+                }`}
+              />
+              <span
+                className={`block h-[2px] rounded-full bg-current transition-all duration-300 ${
+                  isMenuOpen ? 'w-0 opacity-0' : 'w-3 self-end'
+                }`}
+              />
+              <span
+                className={`block h-[2px] w-4 rounded-full bg-current transition-all duration-300 origin-center ${
+                  isMenuOpen ? '-translate-y-[6px] -rotate-45' : ''
+                }`}
+              />
+            </div>
           </button>
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
+      {/* Interactive Animated Mobile Navigation Sheet */}
       {isMenuOpen && (
-        <div className="md:hidden border-b border-brand-border bg-surface-bg px-4 py-3 space-y-1">
-          {navLinks.map((link) => {
-            const isActive = activeSection === link.id;
-            return (
-              <a
-                key={link.id}
-                href={`#${link.id}`}
-                onClick={() => setIsMenuOpen(false)}
-                className={`block px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-purple-700 bg-brand-fill text-white'
-                    : 'text-content-secondary hover:bg-surface-elevated hover:text-content-primary'
-                }`}
-              >
-                {link.name}
-              </a>
-            );
-          })}
-        </div>
+        <>
+          {/* Click-outside Backdrop Scrim */}
+          <div
+            aria-hidden="true"
+            onClick={() => setIsMenuOpen(false)}
+            className="md:hidden fixed inset-x-0 top-16 bottom-0 h-[calc(100dvh-4rem)] bg-black/45 backdrop-blur-xs z-40 transition-opacity"
+          />
+
+          <div className="md:hidden relative z-50 px-4 pt-2 pb-4">
+            <div
+              id="mobile-navigation-drawer"
+              ref={mobileMenuRef}
+              className="rounded-[28px] bg-surface-card border border-brand-border shadow-2xl p-4 overflow-hidden relative"
+            >
+              {/* Subtle Corner Crosshairs */}
+              <span className="geist-crosshair top-2.5 left-2.5" />
+              <span className="geist-crosshair top-2.5 right-2.5" />
+
+              {/* Navigation Items Grid */}
+              <nav className="space-y-1.5" aria-label="Mobile Navigation">
+                {navLinks.map((link) => {
+                  const isActive = activeSection === link.id;
+                  const IconComponent = link.icon;
+                  return (
+                    <a
+                      key={link.id}
+                      href={`#${link.id}`}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`mobile-nav-item group flex items-center justify-between px-4 py-3 rounded-2xl border transition-all duration-200 active:scale-[0.98] ${
+                        isActive
+                          ? 'bg-purple-700 bg-brand-fill text-white border-brand-fill shadow-md'
+                          : 'bg-surface-elevated/80 hover:bg-brand-container text-content-primary border-brand-border hover:border-brand-primary'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <span
+                          className={`h-9 w-9 rounded-full flex items-center justify-center transition-colors ${
+                            isActive
+                              ? 'bg-white/20 text-white'
+                              : 'bg-surface-card text-brand-primary group-hover:bg-brand-fill group-hover:text-white border border-brand-border'
+                          }`}
+                        >
+                          <IconComponent className="h-4 w-4" />
+                        </span>
+                        <span className="font-display text-base font-bold leading-tight">
+                          {link.name}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {isActive && (
+                          <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                        )}
+                        <ArrowUpRight
+                          className={`h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${
+                            isActive ? 'text-white' : 'text-content-muted group-hover:text-brand-primary'
+                          }`}
+                        />
+                      </div>
+                    </a>
+                  );
+                })}
+              </nav>
+
+              {/* Interactive Mobile Menu Footer with Social Pills & Quick CTA */}
+              <div className="mobile-nav-footer mt-4 pt-3.5 border-t border-brand-border flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <a
+                    href={SOCIAL_LINKS.github.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="GitHub"
+                    className="h-9 w-9 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border active:scale-95 transition-all"
+                  >
+                    <Github className="h-4 w-4" />
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.linkedin.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="LinkedIn"
+                    className="h-9 w-9 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border active:scale-95 transition-all"
+                  >
+                    <Linkedin className="h-4 w-4" />
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.twitter.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="X"
+                    className="h-9 w-9 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border active:scale-95 transition-all"
+                  >
+                    <XIcon className="h-4 w-4" />
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.email.url}
+                    aria-label="Email"
+                    className="h-9 w-9 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border active:scale-95 transition-all"
+                  >
+                    <Mail className="h-4 w-4" />
+                  </a>
+                </div>
+
+                <a
+                  href="#contact"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-purple-700 bg-brand-fill text-white text-xs font-semibold shadow-sm active:scale-95 transition-transform"
+                >
+                  <span>Let&apos;s Talk</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </header>
   );
