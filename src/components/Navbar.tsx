@@ -87,11 +87,11 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
         style={{ width: `${scrollProgress}%` }}
       />
 
-      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 h-16 sm:h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Interactive Triangle Brand Mark */}
         <a
           href="#home"
-          className="group inline-flex items-center gap-3 font-display text-xl sm:text-2xl font-bold tracking-tight text-content-primary"
+          className="group inline-flex items-center gap-2.5 font-display text-xl sm:text-2xl font-bold tracking-tight text-content-primary"
         >
           <svg
             aria-hidden="true"
@@ -139,15 +139,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
         </nav>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-2.5">
-          <a
-            href="#contact"
-            className="hidden lg:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-container text-brand-onContainer border border-brand-border text-xs font-semibold hover:bg-brand-fill hover:text-white transition-all duration-200"
-          >
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Available for Work</span>
-          </a>
-
+        <div className="flex items-center gap-2">
           <button
             ref={themeBtnRef}
             type="button"

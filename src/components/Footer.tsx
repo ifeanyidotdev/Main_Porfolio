@@ -5,7 +5,7 @@ import { FOOTER_COPYRIGHT, SOCIAL_LINKS } from '../utils/constant';
 const Footer: React.FC = () => {
   return (
     <footer className="bg-surface-elevated border-t border-brand-border py-12 transition-colors duration-300">
-      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <a
             href="#home"

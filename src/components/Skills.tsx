@@ -65,25 +65,18 @@ const Skills: React.FC = () => {
   }, []);
 
   return (
-    <section
-      id="skills"
-      ref={sectionRef}
-      className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 py-24"
-    >
-      <div className="mb-12 space-y-3">
-        <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-container text-brand-onContainer border border-brand-border font-mono text-xs font-semibold">
-          Core Capabilities
-        </span>
-        <h2 className="font-display section-fluid-title font-bold text-content-primary">
+    <section id="skills" ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="mb-10">
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-[-0.04em] text-content-primary">
           Skills &amp; Stack
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {skillCategories.map((category, index) => (
           <div key={category.title} className={`skill-bento-card ${category.span}`}>
             <Tilt3DCard intensity={4} glare={true}>
-              <div className="geist-card group p-8 sm:p-10 h-full flex flex-col justify-between relative overflow-hidden">
+              <div className="geist-card group p-7 sm:p-9 h-full flex flex-col justify-between relative overflow-hidden">
                 {/* Interactive Background Schematic */}
                 <svg
                   aria-hidden="true"
@@ -124,7 +117,7 @@ const Skills: React.FC = () => {
                   <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-[-0.03em] text-content-primary mb-3">
                     {category.title}
                   </h3>
-                  <p className="text-base sm:text-lg text-content-secondary leading-relaxed mb-8 max-w-xl">
+                  <p className="text-base text-content-secondary leading-relaxed mb-8 max-w-xl">
                     {category.content}
                   </p>
                 </div>
@@ -152,50 +145,6 @@ const Skills: React.FC = () => {
             </Tilt3DCard>
           </div>
         ))}
-      </div>
-
-      {/* Google M3 Full-Width Interactive Tech Stack Marquee Ribbon */}
-      <div className="mt-8 overflow-hidden rounded-full bg-surface-elevated border border-brand-border py-3.5 px-4">
-        <div className="animate-marquee gap-4 items-center">
-          {[
-            'Python',
-            'Django',
-            'Node.js',
-            'TypeScript',
-            'React',
-            'Flutter',
-            'PostgreSQL',
-            'Redis',
-            'GraphQL',
-            'Docker',
-            'Kafka',
-            'AWS',
-            'Firebase',
-            'Socket.io',
-            'Python',
-            'Django',
-            'Node.js',
-            'TypeScript',
-            'React',
-            'Flutter',
-            'PostgreSQL',
-            'Redis',
-            'GraphQL',
-            'Docker',
-            'Kafka',
-            'AWS',
-            'Firebase',
-            'Socket.io',
-          ].map((tech, i) => (
-            <span
-              key={`${tech}-${i}`}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-card border border-brand-border font-mono text-xs font-medium text-content-primary whitespace-nowrap"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-primary" />
-              {tech}
-            </span>
-          ))}
-        </div>
       </div>
     </section>
   );

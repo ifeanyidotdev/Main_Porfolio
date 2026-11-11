@@ -268,19 +268,15 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section
-      id="home"
-      ref={heroRef}
-      className="min-h-screen-dynamic pt-24 pb-10 flex flex-col justify-center"
-    >
-      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16">
-        {/* Google M3 Full-Screen Expressive Bento Stage */}
+    <section id="home" ref={heroRef} className="pt-24 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Google M3 Expressive Bento Stage */}
         <div
           onMouseMove={handleHeroMouseMove}
           onMouseLeave={() => {
             if (spotlightRef.current) spotlightRef.current.style.opacity = '0';
           }}
-          className="relative border border-brand-border bg-surface-card rounded-[32px] overflow-hidden shadow-2xl"
+          className="relative border border-brand-border bg-surface-card rounded-[28px] overflow-hidden shadow-xl"
         >
           {/* Corner Crosshairs (+) */}
           <span className="geist-crosshair top-3 left-3" />
@@ -297,153 +293,96 @@ const Hero: React.FC = () => {
             className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 z-0"
           />
 
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-brand-border min-h-[calc(100dvh-8.5rem)]">
-            {/* Left Full-Height Expressive Stage */}
-            <div className="hero-cell lg:col-span-7 p-7 sm:p-12 lg:p-14 xl:p-20 flex flex-col justify-between gap-10">
-              <div className="space-y-7 perspective-1200">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-container text-brand-onContainer border border-brand-border font-mono text-xs font-semibold">
-                    <span className="h-2 w-2 rounded-full bg-purple-600 bg-brand-fill animate-pulse" />
-                    <span>Software Engineer</span>
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-elevated text-content-secondary border border-brand-border font-mono text-xs">
-                    Full-Stack • Mobile • Cloud
-                  </span>
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-brand-border">
+            {/* Left Architectural Column */}
+            <div className="hero-cell lg:col-span-7 p-8 sm:p-12 lg:p-16 flex flex-col justify-between">
+              <div className="space-y-6 perspective-1200">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-container text-brand-onContainer border border-brand-border font-mono text-xs font-semibold">
+                  <span className="h-2 w-2 rounded-full bg-purple-600 bg-brand-fill animate-pulse" />
+                  <span>Software Engineer</span>
                 </div>
 
-                <h1 className="font-display hero-fluid-title font-bold text-content-primary">
-                  <span className="hero-word inline-block mr-3 sm:mr-4">Ifeanyichukwu</span>
+                <h1 className="font-display text-4xl sm:text-6xl lg:text-[4.35rem] font-bold tracking-[-0.04em] leading-[1.04] text-content-primary">
+                  <span className="hero-word inline-block mr-3">Ifeanyichukwu</span>
                   <span className="hero-word inline-block text-brand-primary">Sampson</span>
                 </h1>
 
-                <p className="text-lg sm:text-xl xl:text-2xl text-content-secondary max-w-2xl leading-relaxed">
+                <p className="text-lg sm:text-xl text-content-secondary max-w-xl leading-relaxed">
                   Fullstack and mobile software engineer crafting resilient backends and
                   cross-platform applications with Python, Django, Node.js, and Flutter.
                 </p>
-
-                <div className="pt-2 flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex flex-wrap items-center gap-3.5">
-                    <a
-                      href={`${SOCIAL_LINKS.github.url}?tab=repositories`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="magnetic-el geist-btn-primary group"
-                    >
-                      <span>View Projects</span>
-                      <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </a>
-                    <a href="#contact" className="magnetic-el geist-btn-secondary">
-                      <span>Contact Me</span>
-                    </a>
-                  </div>
-
-                  <div className="flex items-center gap-2.5">
-                    <a
-                      href={SOCIAL_LINKS.github.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="GitHub"
-                      className="magnetic-el h-11 w-11 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
-                    >
-                      <Github className="h-4 w-4" />
-                    </a>
-                    <a
-                      href={SOCIAL_LINKS.linkedin.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="LinkedIn"
-                      className="magnetic-el h-11 w-11 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
-                    >
-                      <Linkedin className="h-4 w-4" />
-                    </a>
-                    <a
-                      href={SOCIAL_LINKS.twitter.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="X"
-                      className="magnetic-el h-11 w-11 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
-                    >
-                      <X className="h-4 w-4" />
-                    </a>
-                    <a
-                      href={SOCIAL_LINKS.email.url}
-                      aria-label="Email"
-                      className="magnetic-el h-11 w-11 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
-                    >
-                      <Mail className="h-4 w-4" />
-                    </a>
-                  </div>
-                </div>
               </div>
 
-              {/* Google M3 Tonal Engineering Highlights Strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-brand-border">
-                {[
-                  { value: '5+ Yrs', label: 'Engineering' },
-                  { value: '4+', label: 'Ventures Shipped' },
-                  { value: 'Full-Stack', label: 'Python • Node • Go' },
-                  { value: 'Mobile', label: 'Flutter • Native' },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="group p-4 rounded-2xl bg-surface-elevated hover:bg-brand-container border border-brand-border transition-all duration-200"
+              <div className="pt-10 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={`${SOCIAL_LINKS.github.url}?tab=repositories`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="magnetic-el geist-btn-primary group"
                   >
-                    <div className="font-display text-xl sm:text-2xl font-bold text-content-primary group-hover:text-brand-primary transition-colors">
-                      {stat.value}
-                    </div>
-                    <div className="font-mono text-xs text-content-secondary mt-0.5">
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
+                    <span>View Projects</span>
+                    <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </a>
+                  <a href="#contact" className="magnetic-el geist-btn-secondary">
+                    <span>Contact Me</span>
+                  </a>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <a
+                    href={SOCIAL_LINKS.github.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="GitHub"
+                    className="magnetic-el h-10 w-10 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
+                  >
+                    <Github className="h-4 w-4" />
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.linkedin.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="LinkedIn"
+                    className="magnetic-el h-10 w-10 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
+                  >
+                    <Linkedin className="h-4 w-4" />
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.twitter.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="X"
+                    className="magnetic-el h-10 w-10 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </a>
+                  <a
+                    href={SOCIAL_LINKS.email.url}
+                    aria-label="Email"
+                    className="magnetic-el h-10 w-10 rounded-full flex items-center justify-center bg-surface-elevated hover:bg-brand-fill text-content-primary hover:text-white border border-brand-border hover:border-brand-fill transition-colors"
+                  >
+                    <Mail className="h-4 w-4" />
+                  </a>
+                </div>
               </div>
             </div>
 
-            {/* Right Full-Height Interactive 3D Prism Stage */}
-            <div className="hero-cell lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between relative bg-surface-elevated min-h-[440px] lg:min-h-full overflow-hidden">
-              {/* Top Floating Google M3 Glass Pill */}
-              <div className="relative z-20 flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-card/90 backdrop-blur-md border border-brand-border font-mono text-xs text-content-secondary">
-                  <span className="h-2 w-2 rounded-full bg-brand-primary" />
-                  Interactive 3D • Click to Pulse
-                </span>
-                <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-brand-container text-brand-onContainer font-mono text-[11px] font-semibold">
-                  60 FPS WebGL
-                </span>
-              </div>
-
+            {/* Right Interactive 3D Prism Stage */}
+            <div className="hero-cell lg:col-span-5 p-4 flex items-center justify-center relative bg-surface-elevated min-h-[360px] sm:min-h-[440px] overflow-hidden">
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 m-auto w-80 h-80 rounded-full blur-3xl opacity-20"
+                className="pointer-events-none absolute w-64 h-64 rounded-full blur-3xl opacity-15"
                 style={{
                   background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)',
                 }}
               />
-
               <div
                 ref={canvasMountRef}
-                className="relative z-10 w-full h-[360px] sm:h-[440px] lg:h-[480px] my-auto cursor-pointer"
+                className="relative z-10 w-full h-[360px] sm:h-[420px] cursor-pointer"
                 title="Click to pulse 3D prism"
                 aria-label="Interactive 3D prism sculpture"
               />
-
-              {/* Bottom Production Ventures Dock */}
-              <div className="relative z-20 pt-4 border-t border-brand-border flex flex-wrap items-center justify-between gap-2">
-                <span className="font-mono text-[11px] uppercase tracking-wider text-content-muted">
-                  Shipped For
-                </span>
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {['Meghee LLC.', 'Blucera Inc', 'Dora', 'KaboCash'].map((company) => (
-                    <a
-                      key={company}
-                      href="#experience"
-                      className="px-3 py-1 rounded-full bg-surface-card hover:bg-brand-fill text-content-secondary hover:text-white border border-brand-border text-xs font-medium transition-colors"
-                    >
-                      {company}
-                    </a>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>

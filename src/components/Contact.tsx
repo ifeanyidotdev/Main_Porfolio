@@ -93,25 +93,18 @@ const Contact: React.FC = () => {
   ];
 
   return (
-    <section
-      id="contact"
-      ref={sectionRef}
-      className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 py-24"
-    >
-      <div className="mb-12 contact-reveal space-y-3">
-        <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-container text-brand-onContainer border border-brand-border font-mono text-xs font-semibold">
-          Get In Touch
-        </span>
-        <h2 className="font-display section-fluid-title font-bold text-content-primary">
+    <section id="contact" ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="mb-10 contact-reveal">
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-[-0.04em] text-content-primary">
           Contact
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div className="lg:col-span-5 contact-reveal">
           <Tilt3DCard intensity={4} glare={true}>
-            <div className="geist-card p-8 sm:p-12 h-full flex flex-col justify-between bg-surface-elevated">
-              <p className="text-base sm:text-lg xl:text-xl text-content-secondary leading-relaxed mb-8">
+            <div className="geist-card p-8 sm:p-10 h-full flex flex-col justify-between bg-surface-elevated">
+              <p className="text-base sm:text-lg text-content-secondary leading-relaxed mb-8">
                 Have a project in mind or want to discuss collaboration opportunities? I’d love to
                 hear from you! Fill out the form or reach me through any of the contact methods
                 listed.

@@ -57,21 +57,21 @@ const ProjectFallbackArtwork: React.FC<{ project: ProjectItem }> = ({ project })
               cx="315"
               cy="115"
               r="76"
-              stroke="var(--brand-primary)"
-              strokeWidth="1.5"
-              fill="var(--brand-container)"
-              fillOpacity="0.45"
+              stroke="#7c3aed"
+              strokeWidth="1.75"
+              fill="#7c3aed"
+              fillOpacity="0.14"
             />
             <polygon
               points="315,52 372,150 258,150"
-              stroke="var(--brand-primary)"
+              stroke="#8b5cf6"
               strokeWidth="2"
-              fill="var(--brand-fill)"
-              fillOpacity="0.2"
+              fill="#6d28d9"
+              fillOpacity="0.22"
             />
-            <circle cx="315" cy="52" r="5" fill="var(--brand-primary)" />
-            <circle cx="372" cy="150" r="5" fill="var(--brand-primary)" />
-            <circle cx="258" cy="150" r="5" fill="var(--brand-primary)" />
+            <circle cx="315" cy="52" r="5" fill="#7c3aed" />
+            <circle cx="372" cy="150" r="5" fill="#7c3aed" />
+            <circle cx="258" cy="150" r="5" fill="#7c3aed" />
           </>
         )}
 
@@ -81,29 +81,29 @@ const ProjectFallbackArtwork: React.FC<{ project: ProjectItem }> = ({ project })
               cx="310"
               cy="120"
               r="82"
-              stroke="var(--brand-primary)"
-              strokeWidth="1.5"
+              stroke="#7c3aed"
+              strokeWidth="1.75"
               strokeDasharray="5 5"
-              fill="var(--brand-container)"
-              fillOpacity="0.4"
+              fill="#7c3aed"
+              fillOpacity="0.12"
             />
             <circle
               cx="310"
               cy="120"
               r="46"
-              stroke="var(--brand-primary)"
+              stroke="#8b5cf6"
               strokeWidth="2"
               fill="none"
             />
             <path
               d="M 190 175 Q 250 65 345 105"
               fill="none"
-              stroke="var(--brand-primary)"
+              stroke="#7c3aed"
               strokeWidth="2.5"
               strokeLinecap="round"
             />
-            <circle cx="190" cy="175" r="6" fill="var(--brand-fill)" />
-            <circle cx="345" cy="105" r="7" fill="var(--brand-primary)" />
+            <circle cx="190" cy="175" r="6" fill="#6d28d9" />
+            <circle cx="345" cy="105" r="7" fill="#8b5cf6" />
           </>
         )}
 
@@ -116,22 +116,23 @@ const ProjectFallbackArtwork: React.FC<{ project: ProjectItem }> = ({ project })
               height="140"
               rx="16"
               transform="rotate(15 295 115)"
-              stroke="var(--brand-primary)"
-              strokeWidth="1.5"
-              fill="var(--brand-container)"
-              fillOpacity="0.45"
+              stroke="#7c3aed"
+              strokeWidth="1.75"
+              fill="#7c3aed"
+              fillOpacity="0.14"
             />
             <circle
               cx="295"
               cy="115"
               r="38"
-              stroke="var(--brand-primary)"
+              stroke="#8b5cf6"
               strokeWidth="2"
-              fill="var(--bg-primary)"
+              fill="#6d28d9"
+              fillOpacity="0.18"
             />
             <polygon
               points="295,88 308,125 295,116 282,125"
-              fill="var(--brand-primary)"
+              fill="#7c3aed"
             />
           </>
         )}
@@ -142,18 +143,18 @@ const ProjectFallbackArtwork: React.FC<{ project: ProjectItem }> = ({ project })
               cx="275"
               cy="115"
               r="62"
-              stroke="var(--brand-primary)"
-              strokeWidth="1.5"
-              fill="var(--brand-container)"
-              fillOpacity="0.45"
+              stroke="#7c3aed"
+              strokeWidth="1.75"
+              fill="#7c3aed"
+              fillOpacity="0.14"
             />
             <circle
               cx="330"
               cy="115"
               r="62"
-              stroke="var(--brand-primary)"
+              stroke="#8b5cf6"
               strokeWidth="2"
-              fill="var(--brand-fill)"
+              fill="#6d28d9"
               fillOpacity="0.2"
             />
           </>
@@ -186,15 +187,20 @@ const ProjectCard: React.FC<ProjectProps> = ({
   activeTag,
   onHoverTag,
 }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     const img = imgRef.current;
-    if (img && img.complete && img.naturalWidth === 0) {
-      setImageError(true);
+    if (img && img.complete) {
+      if (img.naturalWidth > 1) {
+        setImageLoaded(true);
+      } else {
+        setImageError(true);
+      }
     }
-  }, []);
+  }, [project.image]);
 
   const isHighlightedByTag = activeTag ? project.tags.includes(activeTag) : false;
 
@@ -207,19 +213,28 @@ const ProjectCard: React.FC<ProjectProps> = ({
           }`}
         >
           <div>
-            {/* 3D Floating Preview Frame */}
+            {/* 3D Floating Preview Frame with Always-Ready Fallback Artwork */}
             <div className="relative h-60 sm:h-72 rounded-2xl overflow-hidden bg-surface-elevated mb-6 border border-brand-border translate-z-20">
-              {!imageError ? (
+              <div className="absolute inset-0 z-0">
+                <ProjectFallbackArtwork project={project} />
+              </div>
+              {!imageError && (
                 <img
                   ref={imgRef}
                   src={project.image}
                   alt={project.title}
-                  loading="lazy"
+                  onLoad={(e) => {
+                    if (e.currentTarget.naturalWidth > 1) {
+                      setImageLoaded(true);
+                    } else {
+                      setImageError(true);
+                    }
+                  }}
                   onError={() => setImageError(true)}
-                  className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                  className={`relative z-10 w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 ${
+                    imageLoaded ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                  }`}
                 />
-              ) : (
-                <ProjectFallbackArtwork project={project} />
               )}
             </div>
 
